@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div>11122</div>
+    <script>
+        // 1.js 实现一个函数，完成超过范围的两个大整数相加功能
+        // 主要思路是通过将数字转换为字符串，然后每个字符串在按位相加。
+        function toSum(num1, num2) {
+            let result = '' // 存结果
+            let count = false // 是否需要进位
+
+            // 数字 -> 字符串 -> 数组
+            let arr1 = (num1 + '').split('')
+            let arr2 = (num2 + '').split('')
+
+            // 当数组中没有数字时 且 不需要进位结束循环
+            while (arr1.length || arr2.length || count) {
+
+                count += ~~arr1.pop() + ~~arr2.pop() // 数组的最后一位相加,不存在当0
+                result = count % 10 + result // 取个位数相加
+                count = count > 9 //判断是否需要进位
+            }
+
+            return +result
+        }
+
+        // 2.数组扁平化
+        // 这一种方法通过递归来实现，当元素为数组时递归调用，兼容性好
+        function flatArr(arr) {
+
+            if (!Array.isArray(arr)) return
+
+            let result = [] // 存放结果
+
+            // 拼接数组扁平化之后的值
+            result = arr.reduce(function (preValue, currentValue) {
+                return preValue.concat(Array.isArray(currentValue) ? flatArr(currentValue) : currentValue)
+            }, [])
+
+            return result
+        }
+
+        // 当一个数组被作为文本值或者进行字符串连接操作时，将会自动调用其 toString 方法。
+        // Array对象覆盖了Object的 toString 方法。对于数组对象，toString 方法连接数组并返回一个字符串，其中包含用逗号分隔的每个数组元素。
+        // 这一种方法是利用了 toString 方法，它的一个缺点是改变了元素的类型，只适合于数组中元素都是整数的情况
+        function flaternArr(arr) {
+            // 将数组转为用,分隔的字符串 -> 转数组 -> 将数组的每一项变为Number类型
+            return arr.toString().split(',').map(item => +item)
+        }
+
+        // 3.  js 如何实现数组去重？
+        function unique(arr) {
+            // 不为数组 或 数组长度为1 或者无内容时直接返回
+            if (!Array.isArray(arr) || arr.length <= 1) return
+
+            let result = []
+
+            arr.forEach(item => {
+                // 如果结果数组中不存在该元素的话 就放进结果数组中
+                if (result.indexOf(item) === -1) {
+                    result.push(item)
+                }
+            })
+
+            return result
+        }
+
+        function unique(arr) {
+            if (!Array.isArray(arr) | arr.length <= 1) return
+
+            // 利用es6中的Set数据结构
+            return [...new Set(arr)]
+        }
+
+        // 4. 数组取最大值最小值
+        function getMaxOfArray(numArray) {
+            return Math.max.apply(null, numArray) || Math.max(...numArray)
+        }
+
+        function getMinOfArray(numArray) {
+            return Math.min.apply(null, numArray) || Math.min(...numArray)
+        }
+
+        // 5. 如何求两个数的最大公约数？
+        // 基本思想是采用辗转相除的方法，用大的数去除以小的那个数，然后再用小的数去除以的得到的余数，一直这样递归下去，直到余数为0时，最后的被除数就是两个数的最大公约数
+        function getMaxCommonDivisor(max, min) {
+            if (min === 0) return max // 当余数为0时 就出结果了
+            return getMaxCommonDivisor(min, max % min)
+        }
+
+        // 6. 如何求两个数的最小公倍数？
+        // 基本思想是采用将两个数相乘，然后除以它们的最大公约数
+        function getMinCommonMultiple(max, min) {
+            return max * min / getMaxCommonDivisor(max, min)
+        }
+
+
+        // 7. 实现 IndexOf 方法？
+        // indexOf(target) 数组中存在target则返回target在数组中的索引 否则返回-1
+        function myIndexOf(arr, target) {
+            if (!Array.isArray(arr)) return
+            if (arr.length === 0) return -1
+
+            for (let i = 0; i < arr.length; i++) {
+                if (arr[i] === target) {
+                    return i
+                }
+            }
+
+            return -1
+        }
+
+
+        // 8. 判断一个字符串是否为回文字符串？
+        // 什么是回文字符串 -> 正读反读都一样的字符串
+        function isPalindrome(str) {
+            let reg = /[\W_]/g // 匹配所有非单词字符和下划线
+            let newStr = str.replace(reg, '').toLowerCase() // 转换为空字符且将大写字母转小写字母
+            let reverseStr = newStr.split('').reverse().join('')
+
+            return newStr === reverseStr
+        }
+
+        // 9. 实现一个累加函数的功能比如 sum(1,2,3)(2)
+        function sum(...args) {
+            if (args.length === 0) return 0
+            let result = 0
+
+            result = args.reduce((pre, cur) => pre + cur, 0)
+
+            let add = function (...args) {
+                result = args.reduce((pre, cur) => pre + cur, result)
+                return add
+            }
+
+            add.toString = function () {
+                return result
+            }
+
+            return add
+        }
+
+        // 10. 使用 reduce 方法实现 forEach、map、filter
+        // forEach
+        function forEachUseReduce(array, handler) {
+            array.reduce(function (pre, item, index) {
+                handler(item, index);
+            });
+        }
+
+        // map
+        function mapUseReduce(array, handler) {
+            let result = [];
+
+            array.reduce(function (pre, item, index) {
+                let mapItem = handler(item, index);
+                result.push(mapItem);
+            });
+
+            return result;
+        }
+
+        // filter
+        function filterUseReduce(array, handler) {
+            let result = [];
+
+            array.reduce(function (pre, item, index) {
+                if (handler(item, index)) {
+                    result.push(item);
+                }
+            });
+
+            return result;
+        }
+
+
+        // 11. 手写forEach、map、filter、reduce
+
+        Array.prototype.forEach = function (callback, callbackThis) {
+            for (let i = 0; i < this.length; i++) {
+                callback.call(callbackThis, this[i], i, this)
+            }
+        }
+
+        Array.prototype.map = function (callback, callbackThis) {
+            let result = []
+            for (let i = 0; i < this.length; i++) {
+                let num = callback.call(callbackThis, this[i], i, this) // 数组每一项执行处理函数的返回值作为新数组的每一项
+                result.push(num)
+            }
+            return result
+        }
+
+        Array.prototype.filter = function (callback, callbackThis) {
+            let result = []
+            for (let i = 0; i < this.length; i++) {
+                let isFilter = callback.call(callbackThis, this[i], i, this)
+                if (isFilter) result.push(this[i])
+            }
+            return result
+        }
+
+
+        Array.prototype.reduce = function (callback, initialValue) {
+            let pre = initialValue ? initialValue : this[0]
+            for (let i = initialValue ? 0 : 1; i < this.length; i++) {
+                pre = callback(pre, this[i], i, this)
+            }
+            return pre
+        }
+
+        // 实现任务队列 1,3,4秒后打印1,2,3
+        // new Queue
+        //          .task(1000, () => {
+        //              console.log(1)
+        //          })
+        //          .task(2000, () => {
+        //              console.log(2)
+        //          })
+        //          .task(1000, () => {
+        //              console.log(3)
+        //          })
+        //          .start()
+        class Queue {
+
+            constructor() {
+                this.queue = [] // 任务队列
+            }
+
+            task(time, callback) {
+                this.queue.push({
+                    time,
+                    callback
+                })
+                return this // 用于链式调用
+            }
+
+            start() {
+                const queue = this.queue
+                let resolve = Promise.resolve() // 存放Promisse返回的成功状态 以便执行.then
+
+                queue.forEach(item => {
+                    // 保存每次循环后的状态
+                    resolve = resolve.then(() => {
+                        return new Promise((resolve, reject) => {
+                            setTimeout(() => {
+                                resolve(item.callback)
+                            }, item.time)
+                        })
+                    })
+                })
+            }
+        }
+
+        // 两数组交集
+        const intersect = function (nums1, nums2) {
+            const map = new Map()
+            const result = []
+
+            for (const item of nums1) {
+                if (!map.has(item)) {
+                    map.set(item, 1)
+                } else {
+                    const newItem = map.get(item) + 1
+                    map.set(item, newItem)
+                }
+            }
+
+            for (const items of nums2) {
+                if (map.get(items) > 0) {
+                    result.push(items)
+                    const newItem = map.get(items) - 1
+                    map.set(items, newItem)
+                }
+            }
+
+            return result
+        }
+
+        // 封装cookie
+
+        /** 
+         * 存一条cookie 
+         * * @param {string} key 要存的cookie的名称 
+         * * @param {string} value 要存的cookie的值 
+         * * @param {object} [options] 可选参数，过期时间和目录，如：{ path: '/', expires: 7 }存根目录7天过期的cookie 
+         * */
+        function setCookie(key, value, path = '/', expires) {
+            let cookie = `${key}=${value};` // 设置key和value
+
+            // 判断是否有设置过期时间 没有默认为session(会话结束)
+            if (expires) {
+                let date = new Date()
+                date.setDate(date.getDate() + expires)
+                // toUTCString() 转标准时区
+                cookie += `path=${path};expires=${date.toUTCString()}`
+            }
+            document.cookie = cookie
+        }
+
+        /** 
+         * 取一条cookie 
+         * * @param {string} key 要取的cookie的名称 
+         **/
+        function getCookie(key) {
+            let str = document.cookie // 获取cookie
+            let arr = str.split(';') // ['key1=value1', 'key2=value2']
+            let obj = {} // 存放每一个key、value
+            arr.forEach(item => {
+                let itemArr = item.split('=')
+                obj[itemArr[0]] = decodeURIComponent(itemArr[1]) // 防止低版本浏览器中文字符报错
+            })
+            return obj[key]
+        }
+
+
+        // storage 是 Storage API 的类型，可以是 localStorage 或是 sessionStorage
+        // prefix 则属于 namespace
+        function getStorage(storage, prefix) {
+            // 这里返回一个 Proxy 实例，调用这个实例的 set 或 get 方法来存取数据
+            return new Proxy({}, {
+                set: (obj, prop, value) => {
+                    obj[prop] = value;
+                    storage.setItem(`${prefix}.${prop}`, value);
+                },
+                get: (obj, prop) => {
+                    // return obj[prop];
+                    return storage.getItem(`${prefix}.${prop}`);
+                },
+            });
+        }
+
+        // Create an instance of the storage proxy
+        // 使用的时候首先通过 namespace 创建 Storage Proxy 实例
+        const userObject = getStorage(localStorage, "user");
+
+        // Set a value in localStorage
+        // 然后通过直接访问属性的方法来操作数据
+        userObject.name = "David";
+
+        // Get the value from localStorage
+        // 可以方便的使用解构获取数据
+        const {
+            name
+        } = userObject;
+    </script>
+</body>
+
+</html>
