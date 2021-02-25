@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>圣杯布局</title>
+    <style>
+        .container {
+            /* 两边预留出距离 */
+            padding-left: 100px;
+            padding-right: 200px;
+        }
+        .left {
+            /* 设定宽高 */
+            width: 100px;
+            height: 200px;
+            /* 设置浮动 */
+            float: left;
+            /* 设置margin-left负值回到原位 */
+            margin-left: -100%;
+             /* 通过定位占到父级元素预留出来的位置 */
+            position: relative;
+            right: 100px;
+            background-color: green;
+        }
+        .right {
+            /* 设定宽高 */
+            width: 200px;
+            height: 200px;
+            /* 设置浮动 */
+            float: right;
+            /* 设置margin-left负值回到原位 */
+            margin-left: -200px;
+            /* 通过定位占到父级元素预留出来的位置 */
+            position: relative;
+            left: 200px;
+            background-color:palevioletred;
+        }
+        .center {
+            /* 设定高，宽撑满父级元素 */
+            width: 100%;
+            height: 200px;
+            /* 设置浮动 */
+            float: left;
+            background-color: pink;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="center"></div>
+        <div class="left"></div>
+        <div class="right"></div>
+    </div>
+</body>
+
+</html>
