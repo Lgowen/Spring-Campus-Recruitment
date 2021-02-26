@@ -271,7 +271,7 @@
    inherit 规定应该从父元素继承display属性的值。
 ```
 
-## 11. relative定位的元素，是相对于元素本身的正常位置来进行定位的
+## 11. position 的值 relative 和 absolute 定位原点是？
 
 ```html
 relative定位的元素，是相对于元素本身的正常位置来进行定位的。

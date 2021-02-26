@@ -131,6 +131,7 @@ Object.prototype.toString.call(new Class2()); // "[object Class2]"
 ```
 
 回答:
+
 ```html
 js 中的内置对象主要指的是在程序执行前存在全局作用域里的由 js 定义的一些全局值属性、函数和用来实例化其他对象的构造函数对象。一般我们经常用到的如全局变量值 NaN、undefined，全局函数如 parseInt()、parseFloat() 用来实例化对象的构造函数如 Date、Object 等，还有提供数学计算的单体内置对象如 Math 对象。
 ```
@@ -536,4 +537,389 @@ function randomSort(array) {
 （5）第五种模式是动态原型模式，这一种模式将原型方法赋值的创建过程移动到了构造函数的内部，通过对属性是否存在的判断，可以实现仅在第一次调用函数时对原型对象赋值一次的效果。这一种方式很好地对上面的混合模式进行了封装。
 
 （6）第六种模式是寄生构造函数模式，这一种模式和工厂模式的实现基本相同，我对这个模式的理解是，它主要是基于一个已有的类型，在实例化时对实例化的对象进行扩展。这样既不用修改原来的构造函数，也达到了扩展对象的目的。它的一个缺点和工厂模式一样，无法实现对象的识别。
+```
+
+## 32. Javascript 的作用域链？
+
+```html
+作用域链的作用是保证对执行环境有权访问的所有变量和函数的有序访问，通过作用域链，我们可以访问到外层环境的变量和
+函数。
+
+作用域链的本质上是一个指向变量对象的指针列表。变量对象是一个包含了执行环境中所有变量和函数的对象。作用域链的前
+端始终都是当前执行上下文的变量对象。全局执行上下文的变量对象（也就是全局对象）始终是作用域链的最后一个对象。
+
+当我们查找一个变量时，如果当前执行环境中没有找到，我们可以沿着作用域链向后查找。
+
+作用域链的创建过程跟执行上下文的建立有关....
+```
+
+## 33. 谈谈 This 对象的理解
+
+```html
+   1. 函数调用,this -> window
+   2. 对象调用,this -> 对象
+   3. 实例化调用,this -> 实例化对象
+   4. call、apply、bind -> this -> 传入的值(改变this指向)
+   
+   call 和 apply 的不同在于传参列表不同 call(thisObj, arg1, arg2) apply(thisObj, [arg1, arg2]) 
+   bind -> bind(thisObj) return 一个this -> thisObj 的函数
+```
+
+## 34. eval 是做什么的？
+
+```html
+它的功能是把对应的字符串解析成 JS 代码并运行。
+
+应该避免使用 eval，不安全，非常耗性能（2次，一次解析成 js 语句，一次执行）。
+```
+
+## 35.  什么是 DOM 和 BOM？
+
+```html
+DOM 指的是文档对象模型，它指的是把文档当做一个对象来对待，这个对象主要定义了处理网页内容的方法和接口。
+
+BOM 指的是浏览器对象模型，它指的是把浏览器当做一个对象来对待，这个对象主要定义了与浏览器进行交互的法和接口。BOM
+的核心是 window，而 window 对象具有双重角色，它既是通过 js 访问浏览器窗口的一个接口，又是一个 Global（全局）
+对象。这意味着在网页中定义的任何对象，变量和函数，都作为全局对象的一个属性或者方法存在。window 对象含有 locati
+on 对象、navigator 对象、screen 对象等子对象，并且 DOM 的最根本的对象 document 对象也是 BOM 的 window 对
+象的子对象。
+```
+
+## 36. 写一个通用的事件侦听器函数
+
+```javascript
+   const EventUtils = {
+       // 添加事件
+       addEvent: function (element, type, handle) {
+            if(element.addEventListener) {
+                element.addEventListener(type, handle)
+            }else if(element.attachEvent) {
+                element.attachEvent('on' + type, handle)
+            }else {
+                element['on' + type] = handle
+            }
+       }
+
+
+       // 移除事件
+       removeEvent: function (element, type, handle) {
+            if(element.removeEventListener) {
+               element.removeEventListener(type, handle)
+            }else if(element.detachEvent) {
+                element.detachEvent('on' + type, handle)
+            }else {
+                element['on' + type] = null
+            }
+       }
+
+
+       // 获取事件源对象
+       getTarget: function (event) {
+            return event.target || event.srcElement
+       }
+
+       // 获取event
+       getEvent: function (event) {
+           return event || window.event
+       }
+       
+       // 阻止冒泡
+       stopPropagation: function (event) {
+           if(event.stopPropagation) {
+               event.stopPropagation()
+           }else {
+               event.cancelBubble = true
+           }
+       }
+
+
+       // 阻止默认行为
+       preventDefault: function (event) {
+           if(event.preventDefault) {
+               event.preventDefault()
+           }else {
+               event.returnValue = false
+           }
+       }
+   }
+```
+
+## 37. 写一个观察者模式(发布订阅者模式)
+
+```javascript
+
+```
+
+## 38. 事件是什么？IE 与火狐的事件机制有什么区别？ 如何阻止冒泡？
+
+```html
+1.事件是用户操作网页时发生的交互动作，比如 click/move， 事件除了用户触发的动作外，还可以是文档加载，窗口滚动和大小调整。事件被封装成一个 event 对象，包含了该事件发生时的所有相关信息（ event 的属性）以及可以对事件进行的操作（ event 的方法）。
+
+2.事件处理机制：IE 支持事件冒泡、Firefox 同时支持两种事件模型，也就是：事件冒泡和事件捕获。
+
+3.event.stopPropagation() 或者 ie 下的方法 event.cancelBubble = true;
+```
+
+## 39. 三种事件模型是什么？
+
+```html
+事件是用户操作网页时发生的交互动作或者网页本身的一些操作，现代浏览器一共有三种事件模型。
+
+第一种事件模型是最早的 DOM0 级模型，这种模型不会传播，所以没有事件流的概念，但是现在有的浏览器支持以冒泡的方式实
+现，它可以在网页中直接定义监听函数，也可以通过 js 属性来指定监听函数。这种方式是所有浏览器都兼容的。
+
+第二种事件模型是 IE 事件模型，在该事件模型中，一次事件共有两个过程，事件处理阶段，和事件冒泡阶段。事件处理阶段会首先执行目标元素绑定的监听事件。然后是事件冒泡阶段，冒泡指的是事件从目标元素冒泡到 document，依次检查经过的节点是否绑定了事件监听函数，如果有则执行。这种模型通过 attachEvent 来添加监听函数，可以添加多个监听函数，会按顺序依次执行。
+
+第三种是 DOM2 级事件模型，在该事件模型中，一次事件共有三个过程，第一个过程是事件捕获阶段。捕获指的是事件从 document 一直向下传播到目标元素，依次检查经过的节点是否绑定了事件监听函数，如果有则执行。后面两个阶段和 IE 事件模型的两个阶段相同。这种事件模型，事件绑定的函数是 addEventListener，其中第三个参数可以指定事件是否在捕获阶段执行。
+```
+
+## 40. 事件委托是什么？
+
+```html
+事件委托本质上是利用了浏览器事件冒泡的机制。因为事件在冒泡过程中会上传到父节点，并且父节点可以通过事件对象获取到
+目标节点，因此可以把子节点的监听函数定义在父节点上，由父节点的监听函数统一处理多个子元素的事件，这种方式称为事件代理。
+
+使用事件代理我们可以不必要为每一个子元素都绑定一个监听事件，这样减少了内存上的消耗。并且使用事件代理我们还可以实现事件的动态绑定，比如说新增了一个子节点，我们并不需要单独地为它添加一个监听事件，它所发生的事件会交给父元素中的监听函数来处理。
+```
+
+## 41. ["1", "2", "3"].map(parseInt) 答案是多少？
+
+```html
+parseInt() 函数能解析一个字符串，并返回一个整数，需要两个参数 (val, radix)，其中 radix 表示要解析的数字的基数。（该值介于 2 ~ 36 之间，并且字符串中的数字不能大于 radix 才能正确返回数字结果值）。
+
+
+此处 map 传了 3 个参数 (element, index, array)，默认第三个参数被忽略掉，因此三次传入的参数分别为 "1-0", "2-1", "3-2"
+
+因为字符串的值不能大于基数，因此后面两次调用均失败，返回 NaN ，第一次基数为 0 ，按十进制解析返回 1。
+```
+
+## 42. 什么是闭包，为什么要用它？
+
+```html
+闭包是指有权访问另一个函数作用域中变量的函数，创建闭包的最常见的方式就是在一个函数内创建另一个函数，创建的函数可以
+访问到当前函数的局部变量。
+
+闭包有两个常用的用途。
+
+闭包的第一个用途是使我们在函数外部能够访问到函数内部的变量。通过使用闭包，我们可以通过在外部调用闭包函数，从而在外
+部访问到函数内部的变量，可以使用这种方法来创建私有变量。
+
+函数的另一个用途是使已经运行结束的函数上下文中的变量对象继续留在内存中，因为闭包函数保留了这个变量对象的引用，所以
+这个变量对象不会被回收。
+
+其实闭包的本质就是作用域链的一个特殊的应用，只要了解了作用域链的创建过程，就能够理解闭包的实现原理。
+```
+
+## 43. instanceof 的作用？
+
+```javascript
+// instanceof 运算符用于检测构造函数的 prototype 属性是否出现在某个实例对象的原型链上。
+   function myInstanceof (instanceObj, fn) {
+            let proto = Object.getPrototypeOf(instanceObj) // 获取对象原型
+            let prototype = fn.prototype // 获取构造函数的原型
+
+            while(true) {
+                if(!proto) return false
+                if(proto === prototype) return true
+
+                proto = Object.getPrototypeOf(proto) // 循环原型链查找
+            }
+   }
+
+```
+
+## 44. new 操作符具体干了什么呢？如何实现？
+
+```javascript
+// （1）首先创建了一个新的空对象
+// （2）设置原型，将对象的原型设置为函数的 prototype 对象。
+// （3）让函数的 this 指向这个对象，执行构造函数的代码（为这个新对象添加属性）
+// （4）判断函数的返回值类型，如果是值类型，返回创建的对象。如果是引用类型，就返回这个引用类型的对象。
+   function objectFactory () {
+       // 首先创建一个空对象
+    //    let obj = {}
+       let obj = null  // 初始化 因为该值后面会赋值为一个对象 所以初始化为null
+       
+       let constructor = Array.prototype.shift.call(arguments) // 获取构造函数
+
+    //    obj.__proto__ = constructor.prototype // 新对象的[[prototype]] -> 构造函数的protytype
+       obj = Object.create(constructor.prototype) // 新对象的[[prototype]] -> 构造函数的protytype
+
+       let result = constructor.apply(obj, arguments) // 执行该函数 且this -> 返回的对象 
+
+       let flag = result && ( typeof result === 'object' || typeof result === 'function' )
+
+       return flag ? result : obj // 如果这个函数显示返回一个对象 就返回这个对象 不是就返回实例化对象
+
+       // 返回一个对象
+   }
+```
+
+## 45. Javascript 中，有一个函数，执行时对象查找时，永远不会去查找原型，这个函数是？
+
+```html
+hasOwnProperty
+
+所有继承了 Object 的对象都会继承到 hasOwnProperty 方法。这个方法可以用来检测一个对象是否含有特定的自身属性，和
+in 运算符不同，该方法会忽略掉那些从原型链上继承到的属性。
+```
+
+## 46. 对于 JSON 的了解？
+
+```html
+JSON 是一种数据交换格式，基于文本，优于轻量，用于交换数据。
+
+JSON 可以表示数字、布尔值、字符串、null、数组（值的有序序列），以及由这些值（或数组、对象）所组成的对象（字符串与
+值的映射）。
+
+JSON 使用 JavaScript 语法，但是 JSON 格式仅仅是一个文本。文本可以被任何编程语言读取及作为数据格式传递。
+
+```
+
+```html
+JSON 是一种基于文本的轻量级的数据交换格式。它可以被任何的编程语言读取和作为数据格式来传递。
+
+在项目开发中，我们使用 JSON 作为前后端数据交换的方式。在前端我们通过将一个符合 JSON 格式的数据结构序列化为 JSON 字符串，然后将它传递到后端，后端通过 JSON 格式的字符串解析后生成对应的数据结构，以此来实现前后端数据的一个传递。
+
+因为 JSON 的语法是基于 js 的，因此很容易将 JSON 和 js 中的对象弄混，但是我们应该注意的是 JSON 和 js 中的对象不是一回事，JSON 中对象格式更加严格，比如说在 JSON 中属性值不能为函数，不能出现 NaN 这样的属性值等，因此大多数的 js 对象是不符合 JSON 对象的格式的。
+
+在 js 中提供了两个函数来实现 js 数据结构和 JSON 格式的转换处理，一个是 JSON.stringify 函数，通过传入一个符合 JSON 格式的数据结构，将其转换为一个 JSON 字符串。如果传入的数据结构不符合 JSON 格式，那么在序列化的时候会对这些值进行对应的特殊处理，使其符合规范。在前端向后端发送数据时，我们可以调用这个函数将数据对象转化为 JSON 格式的字符串。
+
+另一个函数 JSON.parse() 函数，这个函数用来将 JSON 格式的字符串转换为一个 js 数据结构，如果传入的字符串不是标准的 JSON 格式的字符串的话，将会抛出错误。当我们从后端接收到 JSON 格式的字符串时，我们可以通过这个方法来将其解析为一个 js 数据结构，以此来进行数据的访问。
+```
+
+## 47. js 延迟加载的方式有哪些？
+
+```html
+js 的加载、解析和执行会阻塞页面的渲染过程，因此我们希望 js 脚本能够尽可能的延迟加载，提高页面的渲染速度。
+
+我了解到的几种方式是：
+
+第一种方式是我们一般采用的是将 js 脚本放在文档的底部，来使 js 脚本尽可能的在最后来加载执行。
+
+第二种方式是给 js 脚本添加 defer 属性，这个属性会让脚本的加载与文档的解析同步解析，然后在文档解析完成后再执行这个脚本文件，这样的话就能使页面的渲染不被阻塞。多个设置了 defer 属性的脚本按规范来说最后是顺序执行的，但是在一些浏览器中可能不是这样。
+
+第三种方式是给 js 脚本添加 async 属性，这个属性会使脚本异步加载，不会阻塞页面的解析过程，但是当脚本加载完成后立即执行 js 脚本，这个时候如果文档没有解析完成的话同样会阻塞。多个 async 属性的脚本的执行顺序是不可预测的，一般不会按照代码的顺序依次执行。
+
+第四种方式是动态创建 DOM 标签的方式，我们可以对文档的加载事件进行监听，当文档加载完成后再动态的创建 script 标签来引入 js 脚本。
+```
+
+## 48. Ajax 是什么? 如何创建一个 Ajax？
+
+```html
+1.创建 XMLHttpRequest 对象，也就是创建一个异步调用对象
+2.创建一个新的 HTTP 请求，并指定该 HTTP 请求的方法、URL 及验证信息
+3.设置响应 HTTP 请求状态变化的函数
+4.发送 HTTP 请求
+5.获取异步调用返回的数据
+6.使用 JavaScript 和 DOM 实现局部刷新
+```
+
+```javascript
+const SERVER_URL = "/server"
+
+let xhr = new XMLHttpRequest() // 1. 创建一个 XMLHttpRequest 对象
+
+// 2. 创建http请求 xhr.open(method, url, isAsync, userInfo)
+xhr.open("GET", SERVEL_URL, true)
+
+// 3. 设置相应HTTP请求状态变化的函数
+xhr.onreadystateChange = function () {
+    if(this.readyState !== 4) return 
+
+    // 当请求成功时
+    if(this.status === 200) {
+        handle(this.response)
+    }else {
+        console.error(this.statusText)
+    }
+}
+
+// 请求失败时的监听函数
+xhr.onerror = function () {
+    console.error(this.statusText)
+}
+
+// 设置响应类型
+xhr.responseType = "json"
+
+// 设置请求头
+xhr.setRequestHeader = ("Accept", "application/json")
+
+// 发送http请求
+xhr.send(null)
+
+// 封装promise实现
+
+function getJSON(url) {
+  // 创建一个 promise 对象
+  let promise = new Promise(function(resolve, reject) {
+    let xhr = new XMLHttpRequest();
+
+    // 新建一个 http 请求
+    xhr.open("GET", url, true);
+
+    // 设置状态的监听函数
+    xhr.onreadystatechange = function() {
+      if (this.readyState !== 4) return;
+
+      // 当请求成功或失败时，改变 promise 的状态
+      if (this.status === 200) {
+        resolve(this.response);
+      } else {
+        reject(new Error(this.statusText));
+      }
+    };
+
+    // 设置错误监听函数
+    xhr.onerror = function() {
+      reject(new Error(this.statusText));
+    };
+
+    // 设置响应的数据类型
+    xhr.responseType = "json";
+
+    // 设置请求头信息
+    xhr.setRequestHeader("Accept", "application/json");
+
+    // 发送 http 请求
+    xhr.send(null);
+  });
+
+  return promise;
+}
+
+```
+
+## 49. 谈一谈浏览器的缓存机制？
+
+```html
+
+   强缓存: 如果缓存资源有效 则直接使用缓存资源 不必再像服务器发起请求
+   1. http1.0 -> Server set Response Header: Expires: 过期时间  可能会出现客户端与服务器的时间出现偏差导致命中不了缓存
+   2. http1.1 -> Server set Response Header: 
+      Cache-Control: max-age=指定资源能够被缓存的时间 这是一个相对的时间，它会根据这个时间的大小和资源第一次请求时的时间来计算出资源过期的时间
+                     private 规定资源只能被客户端缓存 不能被代理服务器缓存
+                     no-store 指定资源不能被缓存
+                     no-cache 指定资源可以被缓存 但是立即失效 每次都需要向服务器发起请求
+   一般来说只需要设置一种 但是两种同时设置时 Cache-Control 的优先级会高于 Expires
+
+   协商缓存: 先会像服务器发起一个请求 如果资源没有发生修改 则返回一个304状态 让浏览器使用本地的缓存副本
+            如果发生了修改 则返回修改后的资源
+   1. Last-Modified: 告诉浏览器当前资源的最后修改时间 当浏览器下一次发请求时 会在request header加上If-Modified-Since的属性
+                                                 属性值为上一次请求资源返回时的Last-Modefined的值
+                                                 当请求发送到服务器后服务器会通过这个属性来和资源的最后一次的修改时间来进行比较，以此来判断资源是否做了修改。
+                                                 如果资源没有修改，那么返回 304 状态，让客户端使用本地的缓存。如果资源已经被修改了，则返回修改后的资源。使用这种方法有一个缺点，就是 Last-Modified 标注的最后修改时间只能精确到秒级，如果某些文件在1秒钟以内，被修改多次的话，那么文件已将改变了但是 Last-Modified 却没有改变
+
+   2. Etag: 这个属性是资源生成的唯一标识符，当资源发生改变的时候，这个值也会发生改变。在下一次资源请求时，浏览器会在请求头中添加If-None-Match 属性，这个属性的值就是上次返回的资源的 Etag 的值。服务接收到请求后会根据这个值来和资源当前的 Etag 的值来比较，以此来判断资源是否发生改变，是否需要返回资源。通过这种方式，比 Last-Modified 的方式更加精确。
+   当 Last-Modified 和 Etag 属性同时出现的时候，Etag 的优先级更高。
+
+   If-Modified-Since: 上一次请求资源时Last-Modified的值
+   If-None-Match: 上一次请求资源时Etag的值
+
+   浏览器请求资源 -> 强缓存(命中使用资源副本) -> 协商缓存 -> 304(资源副本) || 200(向服务器发起请求,响应新资源)                      
+```
+
+## 50. Ajax 解决浏览器缓存问题？
+
 ```
