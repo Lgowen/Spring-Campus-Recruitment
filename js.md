@@ -1,3 +1,9 @@
+---
+title: javascript
+---
+
+This is a student from the beginning of this year to learn front end, was beaten by society and then recorded every day of learning. Have you come to see yourself studying today? If my article is lucky enough to be seen by you, I hope you can keep studying with me.
+
 # javascript
 
 ## 1.介绍 js 的基本数据类型
@@ -1428,6 +1434,7 @@ function getFileExtension(filename) {
 
 ```javascript
 // 函数防抖： 在事件被触发 n 秒后再执行回调，如果在这 n 秒内事件又被触发，则重新计时。
+// 在
 
 // 函数节流： 规定一个单位时间，在这个单位时间内，只能有一次触发事件的回调函数执行，如果在同一个单位时间内某事件被触发多次，只有一次能生效。
 
@@ -1540,4 +1547,530 @@ micro-task(微任务)：Promise的函数，process.nextTick(类似node.js版的s
 
        return newVal
    }
+```
+
+## 74. 手写 call、apply 及 bind 函数
+
+首先我们需要知道几个点
+
+1. 函数调用,this -> window
+2. 对象调用,this -> 对象
+3. 实例化调用,this -> 实例化对象
+
+```javascript
+
+// fn.call(thisArg, arg1, arg2, ...)
+// 
+Function.prototype.call = function (context) {
+    // 作错误调用判断处理
+   if(typeof this !== 'function') return new Error("调用者不是函数")
+    
+   // 获取参数列表
+   let args = [...arguments].slice(1)
+   
+   // 作fn的this处理
+   context = context || window
+   
+   // 将执行的函数 作为context的值
+   context.fn = this
+   
+   // 执行这个函数,在这里fn是context调用 所以this指向context
+   let result = context.fn(...args)
+   
+   // 删除这个函数
+   delete context.fn
+
+   return result
+
+}
+```
+
+```javascript
+// fn.apply(thisArg, [])
+// 
+
+Function.prototype.apply = function (context) {
+   // 作错误调用判断处理
+   if(typeof this !== 'function') return new Error("调用者不是函数")
+
+   // 获取参数数组
+   let args = [...arguments[1]]
+
+   // 作fn的this处理
+   context = context || window
+
+   // 将执行的函数 作为context的值
+   context.fn = this
+
+   // 执行这个函数
+   let result = args ? context.fn(args) : context.fn()
+
+   // 删除这个函数
+   delete context.fn
+
+   return result
+}
+```
+
+```javascript
+// fn.bind(thisArg, )
+// 调用绑定函数时作为 this 参数传递给目标函数的值。 如果使用new运算符构造绑定函数，则忽略该值。当使用 bind 在 setTimeout 中创建一个函数（作为回调提供）时，作为 thisArg 传递的任何原始值都将转换为 object。如果 bind 函数的参数列表为空，或者thisArg是null或undefined，执行作用域的 this 将被视为新函数的 thisArg。
+
+Function.prototype.bind = function (context) {
+   // 作错误调用判断处理
+   if(typeof this !== 'function') return new Error("调用者不是函数")
+    
+   // 获取参数列表
+   let args = [...arguments].slice(1)
+
+   const fn = this
+   
+   return function Fn() {
+       // 如果是通过 new 调用这个函数的话 
+       // instanceof 用来检测 实例化对象的constructor.prototype 在不在 构造函数的原型链上
+       // 所以如果这里this instanceof Fn 成立的话 
+       // 说明 this -> 通过new 实例化出来的对象
+       // 固这个对象的constructor.prototype 在 Fn这个构造函数的原型链上
+       if( this instanceof Fn ) {
+           return new fn(...args, ...arguments)
+       }
+       return fn.apply(context, [...args, ...arguments])
+   }
+}
+```
+
+## 75. 函数柯里化的实现
+
+```javascript
+// 函数柯里化指的是一种将使用多个参数的一个函数转换成一系列使用一个参数的函数的技术。
+
+function curry (fn, args = []) {
+   let length = fn.length // 执行函数所需的参数个数
+
+   return function () {
+       let newArgs = args.slice(0)
+
+       for(let i = 0; i < arguments.length; i++) {
+           newArgs.push(arguments[i])
+       }
+       if(newArgs.length > length) {
+           return fn.apply(this, newArgs)
+       }else {
+           return curry.call(this, fn, newArgs)
+       }
+   }
+}
+
+```
+
+## 76. 什么是 CSP？
+
+```html
+CSP 指的是内容安全策略，它的本质是建立一个白名单，告诉浏览器哪些外部资源可以加载和执行。我们只需要配置规则，如何拦截由浏览器自己来实现。
+
+通常有两种方式来开启 CSP，一种是设置 HTTP 首部中的 Content-Security-Policy，一种是设置 meta 标签的方式 
+<meta http-equiv="Content-Security-Policy">
+```
+
+## 77. 什么是 MVVM？比之 MVC 有什么区别？什么又是 MVP ？
+
+```html
+MVC、MVP 和 MVVM 是三种常见的软件架构设计模式，主要通过分离关注点的方式来组织代码结构，优化我们的开发效率。
+
+比如说我们实验室在以前项目开发的时候，使用单页应用时，往往一个路由页面对应了一个脚本文件，所有的页面逻辑都在一个脚本文件里。页面的渲染、数据的获取，对用户事件的响应所有的应用逻辑都混合在一起，这样在开发简单项目时，可能看不出什么问题，当时一旦项目变得复杂，那么整个文件就会变得冗长，混乱，这样对我们的项目开发和后期的项目维护是非常不利的。
+
+MVC 通过分离 Model、View 和 Controller 的方式来组织代码结构。其中 View 负责页面的显示逻辑，Model 负责存储页面的业务数据，以及对相应数据的操作。并且 View 和 Model 应用了观察者模式，当 Model 层发生改变的时候它会通知有关 View 层更新页面。Controller 层是 View 层和 Model 层的纽带，它主要负责用户与应用的响应操作，当用户与页面产生交互的时候，Co
+ntroller 中的事件触发器就开始工作了，通过调用 Model 层，来完成对 Model 的修改，然后 Model 层再去通知 View 层更新。
+
+MVP 模式与 MVC 唯一不同的在于 Presenter 和 Controller。在 MVC 模式中我们使用观察者模式，来实现当 Model 层数据发生变化的时候，通知 View 层的更新。这样 View 层和 Model 层耦合在一起，当项目逻辑变得复杂的时候，可能会造成代码的混乱，并且可能会对代码的复用性造成一些问题。MVP 的模式通过使用 Presenter 来实现对 View 层和 Model 层的解耦。MVC 中的
+Controller 只知道 Model 的接口，因此它没有办法控制 View 层的更新，MVP 模式中，View 层的接口暴露给了 Presenter 因此我们可以在 Presenter 中将 Model 的变化和 View 的变化绑定在一起，以此来实现 View 和 Model 的同步更新。这样就实现了对 View 和 Model 的解耦，Presenter 还包含了其他的响应逻辑。
+
+MVVM 模式中的 VM，指的是 ViewModel，它和 MVP 的思想其实是相同的，不过它通过双向的数据绑定，将 View 和 Model 的同步更新给自动化了。当 Model 发生变化的时候，ViewModel 就会自动更新；ViewModel 变化了，View 也会更新。这样就将 Presenter 中的工作给自动化了。我了解过一点双向数据绑定的原理，比如 vue 是通过使用数据劫持和发布订阅者模式来实现的这一功
+能。
+```
+
+## 78. vue 双向数据绑定原理？
+
+```html
+vue 通过使用双向数据绑定，来实现了 View 和 Model 的同步更新。vue 的双向数据绑定主要是通过使用数据劫持和发布订阅者模式来实现的。
+
+首先我们通过 Object.defineProperty() 方法来对 Model 数据各个属性添加访问器属性，以此来实现数据的劫持，因此当 Model 中的数据发生变化的时候，我们可以通过配置的 setter 和 getter 方法来实现对 View 层数据更新的通知。
+
+数据在 html 模板中一共有两种绑定情况，一种是使用 v-model 来对 value 值进行绑定，一种是作为文本绑定，在对模板引擎进行解析的过程中。
+
+如果遇到元素节点，并且属性值包含 v-model 的话，我们就从 Model 中去获取 v-model 所对应的属性的值，并赋值给元素的 value 值。然后给这个元素设置一个监听事件，当 View 中元素的数据发生变化的时候触发该事件，通知 Model 中的对应的属性的值进行更新。
+
+如果遇到了绑定的文本节点，我们使用 Model 中对应的属性的值来替换这个文本。对于文本节点的更新，我们使用了发布订阅者模式，属性作为一个主题，我们为这个节点设置一个订阅者对象，将这个订阅者对象加入这个属性主题的订阅者列表中。当 Model 层数据发生改变的时候，Model 作为发布者向主题发出通知，主题收到通知再向它的所有订阅者推送，订阅者收到通知后更改自己的数据
+
+```
+1. Object.defineProperty() 对 Model 数据的各个属性添加访问器属性(数据劫持)
+2. Model 中的数据发生变化时 可以通过setter 和 getter 来实现对View 层数据更新的通知
+3. v-model: (Element && v-model) -> Model 中去获取v-model所对应的属性值 赋值给Element.value 
+   然后给这个Element设置一个监听事件 当View中数据发生变化时触发该事件 通知Model中对对应的属性值进行更新
+4. 文本绑定：Model 中去获取v-model所对应的属性值
+   发布订阅: attribute作为一个Topic 给这个Text Node Set a watcher(订阅者对象) 把它加入到 attribute Topic 的watcher List(订阅者列表)中
+   当 Model 数据发生改变时 Model 作为 publisher 发布update message 给 Topic 发消息
+   Topic 收到消息后 再向它的所有订阅者推送 
+   watcher收到消息后更改自己的数据
+
+## 79. Object.defineProperty 介绍？
+
+```html
+Object.defineProperty 函数一共有三个参数，第一个参数是需要定义属性的对象，第二个参数是需要定义的属性，第三个是该属性描述符。
+
+一个属性的描述符有四个属性，分别是 value 属性的值，writable 属性是否可写，enumerable 属性是否可枚举，configurable 属性是否可配置修改。
+```
+
+## 80. 使用 Object.defineProperty() 来进行数据劫持有什么缺点？
+
+```html
+有一些对属性的操作，使用这种方法无法拦截，比如说通过下标方式修改数组数据或者给对象新增属性，vue 内部通过重写函数解决了这个问题。在 Vue3.0 中已经不使用这种方式了，而是通过使用 Proxy 对对象进行代理，从而实现数据劫持。使用 Proxy 的好处是它可以完美的监听到任何方式的数据改变，唯一的缺点是兼容性的问题，因为这是 ES6 的语法。
+```
+
+## 81.  什么是 Virtual DOM？为什么 Virtual DOM 比原生 DOM 快？
+
+```html
+我对 Virtual DOM 的理解是，
+
+首先对我们将要插入到文档中的 DOM 树结构进行分析，使用 js 对象将其表示出来，比如一个元素对象，包含 TagName、props 和 Children 这些属性。然后我们将这个 js 对象树给保存下来，最后再将 DOM 片段插入到文档中。
+
+当页面的状态发生改变，我们需要对页面的 DOM 的结构进行调整的时候，我们首先根据变更的状态，重新构建起一棵对象树，然后将这棵新的对象树和旧的对象树进行比较，记录下两棵树的的差异。
+
+最后将记录的有差异的地方应用到真正的 DOM 树中去，这样视图就更新了。
+
+我认为 Virtual DOM 这种方法对于我们需要有大量的 DOM 操作的时候，能够很好的提高我们的操作效率，通过在操作前确定需要做的最小修改，尽可能的减少 DOM 操作带来的重流和重绘的影响。其实 Virtual DOM 并不一定比我们真实的操作 DOM 要快，这种方法的目的是为了提高我们开发时的可维护性，在任意的情况下，都能保证一个尽量小的性能消耗去进行操作。
+```
+
+## 82. 如何比较两个 DOM 树的差异？
+
+```html
+两个树的完全 diff 算法的时间复杂度为 O(n^3) ，但是在前端中，我们很少会跨层级的移动元素，所以我们只需要比较同一层级的元素进行比较，这样就可以将算法的时间复杂度降低为 O(n)。
+
+算法首先会对新旧两棵树进行一个深度优先的遍历，这样每个节点都会有一个序号。在深度遍历的时候，每遍历到一个节点，我们就将这个节点和新的树中的节点进行比较，如果有差异，则将这个差异记录到一个对象中。
+
+在对列表元素进行对比的时候，由于 TagName 是重复的，所以我们不能使用这个来对比。我们需要给每一个子节点加上一个 key，列表对比的时候使用 key 来进行比较，这样我们才能够复用老的 DOM 树上的节点。
+```
+
+## 83. 谈谈你对 webpack 的看法
+
+```html
+我当时使用 webpack 的一个最主要原因是为了简化页面依赖的管理，并且通过将其打包为一个文件来降低页面加载时请求的资源
+数。
+
+我认为 webpack 的主要原理是，它将所有的资源都看成是一个模块，并且把页面逻辑当作一个整体，通过一个给定的入口文件，webpack 从这个文件开始，找到所有的依赖文件，将各个依赖文件模块通过 loader 和 plugins 处理后，然后打包在一起，最后输出一个浏览器可识别的 JS 文件。
+
+Webpack 具有四个核心的概念，分别是 Entry（入口）、Output（输出）、loader 和 Plugins（插件）。
+
+Entry 是 webpack 的入口起点，它指示 webpack 应该从哪个模块开始着手，来作为其构建内部依赖图的开始。
+
+Output 属性告诉 webpack 在哪里输出它所创建的打包文件，也可指定打包文件的名称，默认位置为 ./dist。
+
+loader 可以理解为 webpack 的编译器，它使得 webpack 可以处理一些非 JavaScript 文件。在对 loader 进行配置的时候，test 属性，标志有哪些后缀的文件应该被处理，是一个正则表达式。use 属性，指定 test 类型的文件应该使用哪个 loader 进行预处理。常用的 loader 有 css-loader、style-loader 等。
+
+插件可以用于执行范围更广的任务，包括打包、优化、压缩、搭建服务器等等，要使用一个插件，一般是先使用 npm 包管理器进行安装，然后在配置文件中引入，最后将其实例化后传递给 plugins 数组属性。
+
+使用 webpack 的确能够提供我们对于项目的管理，但是它的缺点就是调试和配置起来太麻烦了。但现在 webpack4.0 的免配置一定程度上解决了这个问题。但是我感觉就是对我来说，就是一个黑盒，很多时候出现了问题，没有办法很好的定位。
+```
+
+## 84. offsetWidth/offsetHeight,clientWidth/clientHeight 与 scrollWidth/scrollHeight 的区别？
+
+```html
+clientWidth/clientHeight 返回的是元素的内部宽度，它的值只包含 content + padding，如果有滚动条，不包含滚动条。
+clientTop 返回的是上边框的宽度。
+clientLeft 返回的左边框的宽度。
+
+offsetWidth/offsetHeight 返回的是元素的布局宽度，它的值包含 content + padding + border 包含了滚动条。
+offsetTop 返回的是当前元素相对于其 offsetParent 元素的顶部的距离。
+offsetLeft 返回的是当前元素相对于其 offsetParent 元素的左部的距离。
+
+scrollWidth/scrollHeight 返回值包含 content + padding + 溢出内容的尺寸。
+scrollTop 属性返回的是一个元素的内容垂直滚动的像素数。
+scrollLeft 属性返回的是元素滚动条到元素左边的距离。
+```
+
+## 85. 谈一谈你理解的函数式编程？
+
+```html
+简单说，"函数式编程"是一种"编程范式"（programming paradigm），也就是如何编写程序的方法论。
+
+它具有以下特性：闭包和高阶函数、惰性计算、递归、函数是"第一等公民"、只用"表达式"。
+```
+
+## 86. 异步编程的实现方式？
+
+```html
+回调函数
+优点：简单、容易理解
+缺点：不利于维护，代码耦合高
+
+事件监听（采用时间驱动模式，取决于某个事件是否发生）：
+优点：容易理解，可以绑定多个事件，每个事件可以指定多个回调函数
+缺点：事件驱动型，流程不够清晰
+
+发布/订阅（观察者模式）
+类似于事件监听，但是可以通过‘消息中心’，了解现在有多少发布者，多少订阅者
+
+Promise 对象
+优点：可以利用 then 方法，进行链式写法；可以书写错误时的回调函数；
+缺点：编写和理解，相对比较难
+
+Generator 函数
+优点：函数体内外的数据交换、错误处理机制
+缺点：流程管理不方便
+
+async 函数
+优点：内置执行器、更好的语义、更广的适用性、返回的是 Promise、结构清晰。
+缺点：错误处理机制
+
+js 中的异步机制可以分为以下几种：
+
+第一种最常见的是使用回调函数的方式，使用回调函数的方式有一个缺点是，多个回调函数嵌套的时候会造成回调函数地狱，上下两层的回调函数间的代码耦合度太高，不利于代码的可维护。
+
+第二种是 Promise 的方式，使用 Promise 的方式可以将嵌套的回调函数作为链式调用。但是使用这种方法，有时会造成多个 then 的链式调用，可能会造成代码的语义不够明确。
+
+第三种是使用 generator 的方式，它可以在函数的执行过程中，将函数的执行权转移出去，在函数外部我们还可以将执行权转移回来。当我们遇到异步函数执行的时候，将函数执行权转移出去，当异步函数执行完毕的时候我们再将执行权给转移回来。因此我们在 generator 内部对于异步操作的方式，可以以同步的顺序来书写。使用这种方式我们需要考虑的问题是何时将函数的控制权转移回来，因此我们需要有一个自动执行 generator 的机制，比如说 co 模块等方式来实现 generator 的自动执行。
+
+第四种是使用 async 函数的形式，async 函数是 generator 和 promise 实现的一个自动执行的语法糖，它内部自带执行器，当函数内部执行到一个 await 语句的时候，如果语句返回一个 promise 对象，那么函数将会等待 promise 对象的状态变为 resolve 后再继续向下执行。因此我们可以将异步逻辑，转化为同步的顺序来书写，并且这个函数可以自动执行。
+```
+
+## 87.  Js 动画与 CSS 动画区别及相应实现
+
+```html
+CSS3 的动画的优点
+
+在性能上会稍微好一些，浏览器会对 CSS3 的动画做一些优化
+代码相对简单
+
+缺点
+
+在动画控制上不够灵活
+兼容性不好
+
+JavaScript 的动画正好弥补了这两个缺点，控制能力很强，可以单帧的控制、变换，同时写得好完全可以兼容 IE6，并且功能强大。对于一些复杂控制的动画，使用 javascript 会比较靠谱。而在实现一些小的交互动效的时候，就多考虑考虑 CSS 吧
+```
+
+## 88. 图片的懒加载和预加载
+
+```html
+预加载：提前加载图片，当用户需要查看时可直接从本地缓存中渲染。
+
+懒加载：懒加载的主要目的是作为服务器前端的优化，减少请求数或延迟请求数。
+
+两种技术的本质：两者的行为是相反的，一个是提前加载，一个是迟缓甚至不加载。 懒加载对服务器前端有一定的缓解压力作用，预加载则会增加服务器前端压力。
+
+懒加载也叫延迟加载，指的是在长网页中延迟加载图片的时机，当用户需要访问时，再去加载，这样可以提高网站的首屏加载速度，提升用户的体验，并且可以减少服务器的压力。它适用于图片很多，页面很长的电商网站的场景。懒加载的实现原理是，将页面上的图片的 src 属性设置为空字符串，将图片的真实路径保存在一个自定义属性中，当页面滚动的时候，进行判断，如果图片进入页面可视区域内，则从自定义属性中取出真实路径赋值给图片的 src 属性，以此来实现图片的延迟加载。
+
+预加载指的是将所需的资源提前请求加载到本地，这样后面在需要用到时就直接从缓存取资源。通过预加载能够减少用户的等待时间，提高用户的体验。我了解的预加载的最常用的方式是使用 js 中的 image 对象，通过为 image 对象来设置 scr 属性，来实现图片的预加载。
+
+这两种方式都是提高网页性能的方式，两者主要区别是一个是提前加载，一个是迟缓甚至不加载。懒加载对服务器前端有一定的缓解压力作用，预加载则会增加服务器前端压力。
+```
+
+## 89. js 拖拽功能的实现
+
+```html
+首先是三个事件，分别是 mousedown，mousemove，mouseup
+当鼠标点击按下的时候，需要一个 tag 标识此时已经按下，可以执行 mousemove 里面的具体方法。
+clientX，clientY 标识的是鼠标的坐标，分别标识横坐标和纵坐标，并且我们用 offsetX 和 offsetY 来表示
+元素的元素的初始坐标，移动的举例应该是：
+鼠标移动时候的坐标-鼠标按下去时候的坐标。
+也就是说定位信息为：
+鼠标移动时候的坐标-鼠标按下去时候的坐标+元素初始情况下的 offetLeft.
+
+一个元素的拖拽过程，我们可以分为三个步骤，第一步是鼠标按下目标元素，第二步是鼠标保持按下的状态移动鼠标，第三步是鼠
+标抬起，拖拽过程结束。
+
+这三步分别对应了三个事件，mousedown 事件，mousemove 事件和 mouseup 事件。只有在鼠标按下的状态移动鼠标我们才会
+执行拖拽事件，因此我们需要在 mousedown 事件中设置一个状态来标识鼠标已经按下，然后在 mouseup 事件中再取消这个状
+态。在 mousedown 事件中我们首先应该判断，目标元素是否为拖拽元素，如果是拖拽元素，我们就设置状态并且保存这个时候鼠
+标的位置。然后在 mousemove 事件中，我们通过判断鼠标现在的位置和以前位置的相对移动，来确定拖拽元素在移动中的坐标。
+最后 mouseup 事件触发后，清除状态，结束拖拽事件。
+```
+
+## 90. let 和 const 的注意点？
+
+1. 声明的变量只在声明时的代码块内有效
+2. 不存在声明提升
+3. 存在暂时性死区，如果在变量声明前使用，会报错
+4. 不允许重复声明，重复声明会报错
+
+## 91. Symbol 类型的注意点？
+
+```html
+1.Symbol 函数前不能使用 new 命令，否则会报错。
+2.Symbol 函数可以接受一个字符串作为参数，表示对 Symbol 实例的描述，主要是为了在控制台显示，或者转为字符串时，比较容易区分。
+3.Symbol 作为属性名，该属性不会出现在 for...in、for...of 循环中，也不会被 Object.keys()、Object.getOwnPropertyNames()、JSON.stringify() 返回。
+4.Object.getOwnPropertySymbols 方法返回一个数组，成员是当前对象的所有用作属性名的 Symbol 值。
+5.Symbol.for 接受一个字符串作为参数，然后搜索有没有以该参数作为名称的 Symbol 值。如果有，就返回这个 Symbol 值，否则就新建并返回一个以该字符串为名称的 Symbol 值。
+6.Symbol.keyFor 方法返回一个已登记的 Symbol 类型值的 key。
+```
+
+## 92. Set 和 WeakSet 结构？
+
+```html
+1.ES6 提供了新的数据结构 Set。它类似于数组，但是成员的值都是唯一的，没有重复的值。
+2.WeakSet 结构与 Set 类似，也是不重复的值的集合。但是 WeakSet 的成员只能是对象，而不能是其他类型的值。WeakSet 中的对象都是弱引用，即垃圾回收机制不考虑 WeakSet 对该对象的引用，
+```
+
+## 93. Map 和 WeakMap 结构？
+
+```html
+1.Map 数据结构。它类似于对象，也是键值对的集合，但是“键”的范围不限于字符串，各种类型的值（包括对象）都可以当作键。
+2.WeakMap 结构与 Map 结构类似，也是用于生成键值对的集合。但是 WeakMap 只接受对象作为键名（ null 除外），不接受其他类型的值作为键名。而且 WeakMap 的键名所指向的对象，不计入垃圾回收机制。
+```
+
+## 94. 什么是 Proxy ？
+
+```html
+Proxy 用于修改某些操作的默认行为，等同于在语言层面做出修改，所以属于一种“元编程”，即对编程语言进行编程。
+
+Proxy 可以理解成，在目标对象之前架设一层“拦截”，外界对该对象的访问，都必须先通过这层拦截，因此提供了一种机制，可以对外界的访问进行过滤和改写。Proxy 这个词的原意是代理，用在这里表示由它来“代理”某些操作，可以译为“代理器”。
+```
+
+## 95.require 模块引入的查找方式？
+
+```html
+当 Node 遇到 require(X) 时，按下面的顺序处理。
+
+（1）如果 X 是内置模块（比如 require('http')）
+　　a. 返回该模块。
+　　b. 不再继续执行。
+
+（2）如果 X 以 "./" 或者 "/" 或者 "../" 开头
+　　a. 根据 X 所在的父模块，确定 X 的绝对路径。
+　　b. 将 X 当成文件，依次查找下面文件，只要其中有一个存在，就返回该文件，不再继续执行。
+    X
+    X.js
+    X.json
+    X.node
+
+　　c. 将 X 当成目录，依次查找下面文件，只要其中有一个存在，就返回该文件，不再继续执行。
+    X/package.json（main字段）
+    X/index.js
+    X/index.json
+    X/index.node
+
+（3）如果 X 不带路径
+　　a. 根据 X 所在的父模块，确定 X 可能的安装目录。
+　　b. 依次在每个目录中，将 X 当成文件名或目录名加载。
+
+（4）抛出 "not found"
+```
+
+## 96.什么是 Promise 对象，什么是 Promises/A+ 规范？
+
+```html
+Promise 对象是异步编程的一种解决方案，最早由社区提出。Promises/A+ 规范是 JavaScript Promise 的标准，规定了一个 Promise 所必须具有的特性。
+
+Promise 是一个构造函数，接收一个函数作为参数，返回一个 Promise 实例。一个 Promise 实例有三种状态，分别是 pending、resolved 和 rejected，分别代表了进行中、已成功和已失败。实例的状态只能由 pending 转变 resolved 或者 rejected 状态，并且状态一经改变，就凝固了，无法再被改变了。状态的改变是通过 resolve() 和 reject() 函数来实现的，我们
+```
+
+## 97. 手写一个 Promise
+
+```javascript
+const PENDING = "pending";
+const RESOLVED = "resolved";
+const REJECTED = "rejected";
+
+function MyPromise(fn) {
+  // 保存初始化状态
+  var self = this;
+
+  // 初始化状态
+  this.state = PENDING;
+
+  // 用于保存 resolve 或者 rejected 传入的值
+  this.value = null;
+
+  // 用于保存 resolve 的回调函数
+  this.resolvedCallbacks = [];
+
+  // 用于保存 reject 的回调函数
+  this.rejectedCallbacks = [];
+
+  // 状态转变为 resolved 方法
+  function resolve(value) {
+    // 判断传入元素是否为 Promise 值，如果是，则状态改变必须等待前一个状态改变后再进行改变
+    if (value instanceof MyPromise) {
+      return value.then(resolve, reject);
+    }
+
+    // 保证代码的执行顺序为本轮事件循环的末尾
+    setTimeout(() => {
+      // 只有状态为 pending 时才能转变，
+      if (self.state === PENDING) {
+        // 修改状态
+        self.state = RESOLVED;
+
+        // 设置传入的值
+        self.value = value;
+
+        // 执行回调函数
+        self.resolvedCallbacks.forEach(callback => {
+          callback(value);
+        });
+      }
+    }, 0);
+  }
+
+  // 状态转变为 rejected 方法
+  function reject(value) {
+    // 保证代码的执行顺序为本轮事件循环的末尾
+    setTimeout(() => {
+      // 只有状态为 pending 时才能转变
+      if (self.state === PENDING) {
+        // 修改状态
+        self.state = REJECTED;
+
+        // 设置传入的值
+        self.value = value;
+
+        // 执行回调函数
+        self.rejectedCallbacks.forEach(callback => {
+          callback(value);
+        });
+      }
+    }, 0);
+  }
+
+  // 将两个方法传入函数执行
+  try {
+    fn(resolve, reject);
+  } catch (e) {
+    // 遇到错误时，捕获错误，执行 reject 函数
+    reject(e);
+  }
+}
+
+MyPromise.prototype.then = function(onResolved, onRejected) {
+  // 首先判断两个参数是否为函数类型，因为这两个参数是可选参数
+  onResolved =
+    typeof onResolved === "function"
+      ? onResolved
+      : function(value) {
+          return value;
+        };
+
+  onRejected =
+    typeof onRejected === "function"
+      ? onRejected
+      : function(error) {
+          throw error;
+        };
+
+  // 如果是等待状态，则将函数加入对应列表中
+  if (this.state === PENDING) {
+    this.resolvedCallbacks.push(onResolved);
+    this.rejectedCallbacks.push(onRejected);
+  }
+
+  // 如果状态已经凝固，则直接执行对应状态的函数
+
+  if (this.state === RESOLVED) {
+    onResolved(this.value);
+  }
+
+  if (this.state === REJECTED) {
+    onRejected(this.value);
+  }
+};
 ```
