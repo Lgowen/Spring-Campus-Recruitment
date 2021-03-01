@@ -1967,110 +1967,611 @@ Promise 是一个构造函数，接收一个函数作为参数，返回一个 Pr
 ## 97. 手写一个 Promise
 
 ```javascript
-const PENDING = "pending";
-const RESOLVED = "resolved";
-const REJECTED = "rejected";
+const PENDING = 'pending'
+const RESOLEVD = 'resolved'
+const REJECTED = 'rejected'
 
-function MyPromise(fn) {
-  // 保存初始化状态
-  var self = this;
+function MyPromise (fn) {
+    
 
-  // 初始化状态
-  this.state = PENDING;
+    let self = this
+   
+    // 状态
+    this.state = PENDING
 
-  // 用于保存 resolve 或者 rejected 传入的值
-  this.value = null;
+    this.value = null
+    
+    this.resolveFnList = []
+    this.rejectFnlist = []
 
-  // 用于保存 resolve 的回调函数
-  this.resolvedCallbacks = [];
+    
+    function resolve (value) {
+         if(value instanceof MyPromise) {
+           return value.then(resolve, reject)
+         }
 
-  // 用于保存 reject 的回调函数
-  this.rejectedCallbacks = [];
+         setTimeout(() => {
+            if(self.state === PENDING) {
+              self.state = RESOLVED
 
-  // 状态转变为 resolved 方法
-  function resolve(value) {
-    // 判断传入元素是否为 Promise 值，如果是，则状态改变必须等待前一个状态改变后再进行改变
-    if (value instanceof MyPromise) {
-      return value.then(resolve, reject);
+              self.value = value
+
+              self.resolveFnList.forEach(callback => callback(value))
+            }
+         }, 0)
     }
 
-    // 保证代码的执行顺序为本轮事件循环的末尾
-    setTimeout(() => {
-      // 只有状态为 pending 时才能转变，
-      if (self.state === PENDING) {
-        // 修改状态
-        self.state = RESOLVED;
 
-        // 设置传入的值
-        self.value = value;
+    function reject (value) {
 
-        // 执行回调函数
-        self.resolvedCallbacks.forEach(callback => {
-          callback(value);
-        });
-      }
-    }, 0);
+         setTimeout(() => {
+                    
+            if(self.state === PENDING) {
+               self.state = REJECTED
+
+               self.value = value
+
+               self.rejectFnlist.forEach(callback => callback(value))
+            }
+         }, 0)
+    }
+
+    try {
+      fn(resolve, reject)
+    } catch (e) {
+      reject(e)
+    }
+
+}
+
+MyPromise.prototype.then = function (resolveFn, rejectFn) {
+    
+    resolveFn = typeof resolveFn === 'function' ? resolveFn : function (value) { return value }
+
+    rejectFn = typeof rejectFn === 'function' ? rejectFn : function (error) { throw error }
+
+    if(this.state === PENDING) {
+       this.resolveFnList.push(resolveFn)
+       this.rejectFnList.push(rejectFn)
+    }
+
+    if(this.state === RESOLVED) {
+       resolveFn(this.value)
+    }
+
+    if(this.state === REJECTED) {
+       rejectFn(this.value)
+    }
+
+}
+```
+
+## 98. 单例模式模式是什么？
+
+```html
+单例模式保证了全局只有一个实例来被访问。比如说常用的如弹框组件的实现和全局状态的实现。
+```
+
+## 99. 观察者模式和发布订阅模式有什么不同？
+
+```html
+发布订阅模式其实属于广义上的观察者模式
+
+在观察者模式中，观察者需要直接订阅目标事件。在目标发出内容改变的事件后，直接接收事件并作出响应。
+
+而在发布订阅模式中，发布者和订阅者之间多了一个调度中心。调度中心一方面从发布者接收事件，另一方面向订阅者发布事件，订阅者需要在调度中心中订阅事件。通过调度中心实现了发布者和订阅者关系的解耦。使用发布订阅者模式更利于我们代码的可维护性。
+
+```
+
+```html
+观察者模式:   观察者  ->  订阅目标事件   ->   目标发出内容改变的事件后    ->   观察者接收作出相应
+
+发布订阅模式:            发布者   ------发布事件----->      <---接收事件----      调度中心    ----发布这事件--->     <------订阅事件-----  订阅者
+```
+
+## 100. Vue 的生命周期是什么？
+
+```html
+Vue 的生命周期指的是组件从创建到销毁的一系列的过程，被称为 Vue 的生命周期。通过提供的 Vue 在生命周期各个阶段的钩子函数，我们可以很好的在 Vue 的各个生命阶段实现一些操作。
+```
+
+## 101. Vue 的各个生命阶段是什么?
+
+```html
+Vue 一共有8个生命阶段，分别是创建前、创建后、加载前、加载后、更新前、更新后、销毁前和销毁后，每个阶段对应了一个生命周期的钩子函数。
+
+（1）beforeCreate 钩子函数，在实例初始化之后，在数据监听和事件配置之前触发。因此在这个事件中我们是获取不到 data 数据的。
+
+（2）created 钩子函数，在实例创建完成后触发，此时可以访问 data、methods 等属性。但这个时候组件还没有被挂载到页面中去，所以这个时候访问不到 $el 属性。一般我们可以在这个函数中进行一些页面初始化的工作，比如通过 ajax 请求数据来对页面进行初始化。
+
+（3）beforeMount 钩子函数，在组件被挂载到页面之前触发。在 beforeMount 之前，会找到对应的 template，并编译成 render 函数。
+
+（4）mounted 钩子函数，在组件挂载到页面之后触发。此时可以通过 DOM API 获取到页面中的 DOM 元素。
+
+（5）beforeUpdate 钩子函数，在响应式数据更新时触发，发生在虚拟 DOM 重新渲染和打补丁之前，这个时候我们可以对可能会被移除的元素做一些操作，比如移除事件监听器。
+
+（6）updated 钩子函数，虚拟 DOM 重新渲染和打补丁之后调用。
+
+（7）beforeDestroy 钩子函数，在实例销毁之前调用。一般在这一步我们可以销毁定时器、解绑全局事件等。
+
+（8）destroyed 钩子函数，在实例销毁之后调用，调用后，Vue 实例中的所有东西都会解除绑定，所有的事件监听器会被移除，所有的子实例也会被销毁。
+
+当我们使用 keep-alive 的时候，还有两个钩子函数，分别是 activated 和 deactivated 。用 keep-alive 包裹的组件在切换时不会进行销毁，而是缓存到内存中并执行 deactivated 钩子函数，命中缓存渲染后会执行 actived 钩子函数。
+```
+
+## 102 vue3.0 生命周期钩子
+
+```html
+ 
+ (1) beforeCreate: 在实例初始化之后，数据观测 (data observer) 和 event/watcher 事件配置之前被调用。
+
+ (2) created: 在实例创建完成后被立即调用。在这一步，实例已完成以下的配置：数据观测 (data observer)，property 和方法的运算，watch/event 事件回调。然而，挂载阶段还没开始，$el property 目前尚不可用。
+
+ (3) beforeMount 在挂载开始之前被调用：相关的 render 函数首次被调用。
+
+ (4) mounted 实例被挂载后调用，这时 Vue.createApp({}).mount() 被新创建的 vm.$el 替换了。如果根实例挂载到了一个文档内的元素上，当 mounted 被调用时 vm.$el 也在文档内。注意 mounted 不会保证所有的子组件也都一起被挂载。如果你希望等到整个视图都渲染完毕，可以在 mounted 内部使用 vm。$nextTick
+ 该钩子在服务器端渲染期间不被调用。
+
+ (5) beforeUpdate 数据更新时调用，发生在虚拟 DOM 打补丁之前。这里适合在更新之前访问现有的 DOM，比如手动移除已添加的事件监听器。
+ 该钩子在服务器端渲染期间不被调用，因为只有初次渲染会在服务端进行。
+
+ (6) updated: 于数据更改导致的虚拟 DOM 重新渲染和打补丁，在这之后会调用该钩子。
+
+   当这个钩子被调用时，组件 DOM 已经更新，所以你现在可以执行依赖于 DOM 的操作。然而在大多数情况下，你应该避免在此期间更改状态。如果要相应状态改变，通常最好使用计算属性或侦听器取而代之。
+ 
+   注意，updated 不会保证所有的子组件也都一起被重绘。如果你希望等到整个视图都重绘完毕，可以在 updated 里使用 vm.$nextTick：
+
+ (7) beforeUnmount 在卸载组件实例之前调用。在这个阶段，实例仍然是完全正常的。 该钩子在服务器端渲染期间不被调用。
+
+ (8) unmounted: 卸载组件实例后调用。调用此钩子时，组件实例的所有指令都被解除绑定，所有事件侦听器都被移除，所有子组件实例被卸载。
+```
+
+## 103. Vue 组件间的参数传递方式？
+
+```html
+（1）父子组件间通信
+
+第一种方法是子组件通过 props 属性来接受父组件的数据，然后父组件在子组件上注册监听事件，子组件通过 emit 触发事
+件来向父组件发送数据。
+
+第二种是通过 ref 属性给子组件设置一个名字。父组件通过 $refs 组件名来获得子组件，子组件通过 $parent 获得父组
+件，这样也可以实现通信。
+
+第三种是使用 provider/inject，在父组件中通过 provider 提供变量，在子组件中通过 inject 来将变量注入到组件
+中。不论子组件有多深，只要调用了 inject 那么就可以注入 provider 中的数据。
+
+（2）兄弟组件间通信
+
+第一种是使用 eventBus 的方法，它的本质是通过创建一个空的 Vue 实例来作为消息传递的对象，通信的组件引入这个实
+例，通信的组件通过在这个实例上监听和触发事件，来实现消息的传递。
+
+第二种是通过 $parent.$refs 来获取到兄弟组件，也可以进行通信。
+
+（3）任意组件之间
+
+使用 eventBus ，其实就是创建一个事件中心，相当于中转站，可以用它来传递事件和接收事件。
+
+
+如果业务逻辑复杂，很多组件之间需要同时处理一些公共的数据，这个时候采用上面这一些方法可能不利于项目的维护。这个时候
+可以使用 vuex ，vuex 的思想就是将这一些公共的数据抽离出来，将它作为一个全局的变量来管理，然后其他组件就可以对这个
+公共数据进行读写操作，这样达到了解耦的目的。
+```
+
+## 104. computed 和 watch 的差异？
+
+```html
+（1）computed 是计算一个新的属性，并将该属性挂载到 Vue 实例上，而 watch 是监听已经存在且已挂载到 Vue 实例上的数据，所以用 watch 同样可以监听 computed 计算属性的变化。
+
+（2）computed 本质是一个惰性求值的观察者，具有缓存性，只有当依赖变化后，第一次访问 computed 属性，才会计算新的值。而 watch 则是当数据发生变化便会调用执行函数。
+
+（3）从使用场景上说，computed 适用一个数据被多个数据影响，而 watch 适用一个数据影响多个数据。
+```
+
+## 105. vue-router 中的导航钩子函数
+
+```html
+ （1）全局的钩子函数 beforeEach 和 afterEach
+
+beforeEach 有三个参数，to 代表要进入的路由对象，from 代表离开的路由对象。next 是一个必须要执行的函数，如果不传参数，那就执行下一个钩子函数，如果传入 false，则终止跳转，如果传入一个路径，则导航到对应的路由，如果传入 error ，则导航终止，error 传入错误的监听函数。
+
+（2）单个路由独享的钩子函数 beforeEnter，它是在路由配置上直接进行定义的。
+
+（3）组件内的导航钩子主要有这三种：beforeRouteEnter、beforeRouteUpdate、beforeRouteLeave。它们是直接在路由组件内部直接进行定义的。
+```
+
+## 106. $route 和 $router 的区别？
+
+```html
+$route 是“路由信息对象”，包括 path，params，hash，query，fullPath，matched，name 等路由信息参数。
+而 $router 是“路由实例”对象包括了路由的跳转方法，钩子函数等。
+```
+
+## 107. vue 常用的修饰符？
+
+```html
+.prevent: 提交事件不再重载页面；.stop: 阻止单击事件冒泡；.self: 当事件发生在该元素本身而不是子元素的时候会触发；
+```
+
+## 108.  vue 中 key 值的作用？
+
+```html
+vue 中 key 值的作用可以分为两种情况来考虑。
+
+第一种情况是 v-if 中使用 key。由于 Vue 会尽可能高效地渲染元素，通常会复用已有元素而不是从头开始渲染。因此当我们使用 v-if 来实现元素切换的时候，如果切换前后含有相同类型的元素，那么这个元素就会被复用。如果是相同的 input 元素，那么切换前后用户的输入不会被清除掉，这样是不符合需求的。因此我们可以通过使用 key 来唯一的标识一个元素，这个情况下，使用 key 的元素不会被复用。这个时候 key 的作用是用来标识一个独立的元素。
+
+第二种情况是 v-for 中使用 key。用 v-for 更新已渲染过的元素列表时，它默认使用“就地复用”的策略。如果数据项的顺序发生了改变，Vue 不会移动 DOM 元素来匹配数据项的顺序，而是简单复用此处的每个元素。因此通过为每个列表项提供一个 key 值，来以便 Vue 跟踪元素的身份，从而高效的实现复用。这个时候 key 的作用是为了高效的更新渲染虚拟 DOM。
+```
+
+## 109. computed 和 watch 区别？
+
+```html
+computed 是计算属性，依赖其他属性计算值，并且 computed 的值有缓存，只有当计算值变化才会返回内容。
+
+watch 监听到值的变化就会执行回调，在回调中可以进行一些逻辑操作。
+```
+
+## 110. keep-alive 组件有什么作用？
+
+```html
+如果你需要在组件切换的时候，保存一些组件的状态防止多次渲染，就可以使用 keep-alive 组件包裹需要保存的组件。
+```
+
+## 111. vue 中 mixin 和 mixins 区别？
+
+```html
+mixin 用于全局混入，会影响到每个组件实例。
+
+mixins 应该是我们最常使用的扩展组件的方式了。如果多个组件中有相同的业务逻辑，就可以将这些逻辑剥离出来，通过 mixins 混入代码，比如上拉下拉加载数据这种逻辑等等。另外需要注意的是 mixins 混入的钩子函数会先于组件内的钩子函数执行，并且在遇到同名选项的时候也会有选择性的进行合并
+```
+
+## 112. 开发中常用的几种 Content-Type ？
+
+```html
+（1）application/x-www-form-urlencoded
+
+浏览器的原生 form 表单，如果不设置 enctype 属性，那么最终就会以 application/x-www-form-urlencoded 方式提交数据。该种方式提交的数据放在 body 里面，数据按照 key1=val1&key2=val2 的方式进行编码，key 和 val 都进行了 URL
+转码。
+
+（2）multipart/form-data
+
+该种方式也是一个常见的 POST 提交方式，通常表单上传文件时使用该种方式。
+
+（3）application/json
+
+告诉服务器消息主体是序列化后的 JSON 字符串。
+
+（4）text/xml
+
+该种方式主要用来提交 XML 格式的数据。
+```
+
+## 113. 如何封装一个 javascript 的类型判断函数？
+
+```html
+function getType(value) {
+  // 判断数据是 null 的情况
+  if (value === null) {
+    return value + "";
   }
 
-  // 状态转变为 rejected 方法
-  function reject(value) {
-    // 保证代码的执行顺序为本轮事件循环的末尾
-    setTimeout(() => {
-      // 只有状态为 pending 时才能转变
-      if (self.state === PENDING) {
-        // 修改状态
-        self.state = REJECTED;
+  // 判断数据是引用类型的情况
+  if (typeof value === "object") {
+    let valueClass = Object.prototype.toString.call(value),
+      type = valueClass.split(" ")[1].split("");
 
-        // 设置传入的值
-        self.value = value;
+    type.pop();
 
-        // 执行回调函数
-        self.rejectedCallbacks.forEach(callback => {
-          callback(value);
-        });
-      }
-    }, 0);
+    return type.join("").toLowerCase();
+  } else {
+    // 判断数据是基本数据类型的情况和函数的情况
+    return typeof value;
   }
+}
+```
 
-  // 将两个方法传入函数执行
-  try {
-    fn(resolve, reject);
-  } catch (e) {
-    // 遇到错误时，捕获错误，执行 reject 函数
-    reject(e);
+## 114. 如何判断一个对象是否为空对象？
+
+```html
+function checkNullObj(obj) {
+  return Object.keys(obj).length === 0;
+}
+```
+
+## 115. 使用闭包实现每隔一秒打印 1,2,3,4
+
+```html
+// 使用闭包实现
+for (var i = 0; i < 5; i++) {
+  (function(i) {
+    setTimeout(function() {
+      console.log(i);
+    }, i * 1000);
+  })(i);
+}
+
+// 使用 let 块级作用域
+
+for (let i = 0; i < 5; i++) {
+  setTimeout(function() {
+    console.log(i);
+  }, i * 1000);
+}
+```
+
+## 116. 手写一个观察者模式？
+
+```javascript
+
+const events = (function() {
+    let topics = {}
+
+    return {
+      // 注册监听函数
+      subscribe: function (topic, handle) {
+         if(!topics.hasOwnProperty(topic)) {
+            topics[topic] = []
+         }
+           topics[topic].push(handle)
+      }
+
+      // 发布事件,触发观察者回调事件
+      publish: function (topic, info) {
+        if(topics.hasOwnProperty(topic)) {
+           topics[topic].forEach( handle => handle(info))
+        }
+      }
+
+      // 移除主题的一个观察者回调事件
+      remove: function (topic, handle) {
+          if (!topics.hasOwnProperty(topic)) return;
+
+          let targetIndex = -1
+          topics[topic].forEach((item, index) => {
+            if(item === handle) {
+              targetIndex = index
+            }
+          })
+
+          if(targetIndex >= 0) {
+            topics[topic].splice(targetIndex, 1)
+          }
+      }
+
+      // 移除主题所有的观察者回调事件
+      removeAll: function (topic) {
+        if(topics.hasOwnProperty(topic)) {
+          topics[topic] = []
+        }
+      }
+    }
+})()
+
+```
+
+## 117. EventEmitter 实现
+
+```javascript
+   class EventEmitter {
+     constructor() {
+       this.events = {}
+     }
+
+     on(event, callback) {
+       let callbackList = this.event[event] || []
+       callbackList.push(callback)
+       this.events[event] = callbackList
+
+       return this
+     }
+
+     off(event, callback) {
+       let callbackList = this.events[event]
+       callbackList = callbackList.filter(fn => fn !== callback)
+       this.events[event] = callbackList
+
+       return this
+     }
+
+     emit(event, ...args) {
+       let callbackList = this.events[event]
+       callbackList.forEach(callback => callback(...args))
+
+       return this
+     }
+
+     once(event, callback) {
+       let wrapFn = function (...args) {
+         callback(...args)
+
+         this.off(event, wrapFn)
+       }
+       this.on(event, wrapFn)
+       return this
+     }
+     
+   }
+```
+
+## 118. 一道常被人轻视的前端 JS 面试题
+
+```javascript
+function Foo() {
+  getName = function() {
+    alert(1);
+  };
+  return this;
+}
+Foo.getName = function() {
+  alert(2);
+};
+Foo.prototype.getName = function() {
+  alert(3);
+};
+var getName = function() {
+  alert(4);
+};
+function getName() {
+  alert(5);
+}
+
+// 预编译阶段
+Global: {
+  Foo: function Foo() {
+    getName = function() {
+      alert(1)
+    };
+    return this
+  }
+  getName: function getName() {
+    alert(5)
   }
 }
 
-MyPromise.prototype.then = function(onResolved, onRejected) {
-  // 首先判断两个参数是否为函数类型，因为这两个参数是可选参数
-  onResolved =
-    typeof onResolved === "function"
-      ? onResolved
-      : function(value) {
-          return value;
-        };
+//执行
+Foo.getName = function () {
+  alert(2)
+}
 
-  onRejected =
-    typeof onRejected === "function"
-      ? onRejected
-      : function(error) {
-          throw error;
-        };
-
-  // 如果是等待状态，则将函数加入对应列表中
-  if (this.state === PENDING) {
-    this.resolvedCallbacks.push(onResolved);
-    this.rejectedCallbacks.push(onRejected);
+Global: {
+  Foo: function () {
+    getName = function() {
+      alert(1)
+    };
+    getName: function() {
+      alert(2)
+    };
+    return this
   }
-
-  // 如果状态已经凝固，则直接执行对应状态的函数
-
-  if (this.state === RESOLVED) {
-    onResolved(this.value);
+  getName: function () {
+    alert(5)
   }
+}
 
-  if (this.state === REJECTED) {
-    onRejected(this.value);
-  }
+//执行
+Foo.prototype.getName = function() {
+  alert(3);
 };
+
+Global: {
+  Foo: function () {
+    getName = function() {
+      alert(1)
+    };
+    getName: function() {
+      alert(2)
+    };
+    prototype: {
+      getName: function () {
+        alert(3)
+      }
+    }
+    return this
+  }
+  getName: function () {
+    alert(5)
+  }
+}
+
+//执行
+getName = function() {
+  alert(4);
+}
+
+Global: {
+  Foo: function () {
+    getName = function () {
+      alert(1)
+    }
+    getName: function() {
+      alert(2)
+    };
+    prototype: {
+      getName: function () {
+        alert(3)
+      }
+    }
+    return this
+  }
+  getName: function() {
+    alert(4);
+  }
+}
+
+//请写出以下输出结果：
+Foo.getName(); // 2
+getName(); // 4
+Foo().getName(); // 1
+// Foo()
+Global: {
+  Foo: function () {
+    getName = function () {
+      alert(1)
+    }
+    getName: function() {
+      alert(2)
+    };
+    prototype: {
+      getName: function () {
+        alert(3)
+      }
+    }
+    return this
+  }
+  getName = function () {
+      alert(1)
+  }
+}
+
+// 执行完后 return this -> window(BOM) -> Global(DOM)
+
+getName(); // 1
+new Foo.getName(); // 2 return { }
+new Foo().getName(); // 3 
+// 执行new Foo() 
+// return { __proto__: { getName: function () {alert(3) } }} 
+// 执行.getName() 自己身上没有这个属性 从原型链上查找后执行
+new new Foo().getName(); // 3 return { }
+```
+
+## 118. Object.assign()
+
+```html
+Object.assign() 方法用于将所有可枚举属性的值从一个或多个源对象复制到目标对象。它将返回目标对象。
+```
+
+## 119. 一个列表，假设有 100000 个数据，这个该怎么办？
+
+```html
+我们需要思考的问题：该处理是否必须同步完成？数据是否必须按顺序完成？
+
+解决办法：
+
+（1）将数据分页，利用分页的原理，每次服务器端只返回一定数目的数据，浏览器每次只对一部分进行加载。
+
+（2）使用懒加载的方法，每次加载一部分数据，其余数据当需要使用时再去加载。
+
+（3）使用数组分块技术，基本思路是为要处理的项目创建一个队列，然后设置定时器每过一段时间取出一部分数据，然后再使用定时器取出下一个要处理的项目进行处理，接着再设置另一个定时器。
+```
+
+## 120. js 中倒计时的纠偏实现？
+
+```html
+在前端实现中我们一般通过 setTimeout 和 setInterval 方法来实现一个倒计时效果。但是使用这些方法会存在时间偏差的问题，这是由于 js 的程序执行机制造成的，setTimeout 和 setInterval 的作用是隔一段时间将回调事件加入到事件队列中，因此事件并不是立即执行的，它会等到当前执行栈为空的时候再取出事件执行，因此事件等待执行的时间就是造成误差的原因。
+
+一般解决倒计时中的误差的有这样两种办法：
+
+（1）第一种是通过前端定时向服务器发送请求获取最新的时间差，以此来校准倒计时时间。
+
+（2）第二种方法是前端根据偏差时间来自动调整间隔时间的方式来实现的。这一种方式首先是以 setTimeout 递归的方式来实现倒计时，然后通过一个变量来记录已经倒计时的秒数。每一次函数调用的时候，首先将变量加一，然后根据这个变量和每次的间隔时间，我们就可以计算出此时无偏差时应该显示的时间。然后将当前的真实时间与这个时间相减，这样我们就可以得到时间的偏差大小，因此我们在设置下一个定时器的间隔大小的时候，我们就从间隔时间中减去这个偏差大小，以此来实现由于程序执行所造成的时间误差的纠正。
+```
+
+## 121. 进程间通信的方式？
+
+```html
+1.管道通信
+2.消息队列通信
+3.信号量通信
+4.信号通信
+5.共享内存通信
+6.套接字通信
 ```

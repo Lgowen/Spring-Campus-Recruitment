@@ -19,3 +19,11 @@ Function.prototype.bind = function (context) {
 let newApp =  app.bind(obj, 1, 2)
 console.log(newApp);
 newApp()
+
+Array.prototype.myReduce = function(callback, init) {
+    let pre = init ? init : 0
+    for(let i = 0; i < this.length; i++) {
+        pre = callback(pre, this[i], i, this)
+    }
+    return pre
+}
