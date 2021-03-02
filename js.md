@@ -2074,3 +2074,9 @@ MyPromise.prototype.then = function(onResolved, onRejected) {
   }
 };
 ```
+
+## 98. 什么是 rest 参数？
+
+```html
+rest运算符也是三个点号，不过其功能与扩展运算符恰好相反，把逗号隔开的值序列组合成一个数组。
+```
