@@ -27,3 +27,4 @@ Array.prototype.myReduce = function(callback, init) {
     }
     return pre
 }
+
