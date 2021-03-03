@@ -65,5 +65,27 @@
         <div class="content"></div>
         <div class="footer"></div>
     </div>
+    <script>
+        // function A() {this.value = 1}
+        // function B() {this.value = 2}
+        // function C() {this.value = 3}
+        // var c = new C()
+        // C.prototype = new A()
+        // A.prototype = new B()
+        // console.log(c.__proto__.value, c.__proto__.constructor);
+
+        const app = () => {
+            console.log(this)
+        }
+        function agg(){
+            console.log(this);
+            const asd = () => {
+                console.log(this);
+            }
+            asd()
+        }
+        app()
+        agg()
+    </script>
 </body>
 </html>
