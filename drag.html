@@ -12,8 +12,12 @@
             /*设置绝对定位，脱离文档流，便于拖拽*/
             display: block;
             width: 218px;
+            padding: 15px;
+            margin: 10px;
             height: 280px;
-            cursor: move;
+            border: 1px solid #666;
+            cursor: pointer;
+            background-color: cadetblue;
             /*鼠标呈拖拽状*/
         }
     </style>
@@ -21,56 +25,49 @@
 
 <body>
     <div class="calculator" id="drag">**********</div>
+
     <script>
         window.onload = function () {
-            //拖拽功能(主要是触发三个事件：onmousedown\onmousemove\onmouseup)
-            var drag = document.getElementById('drag');
 
-            //点击某物体时，用drag对象即可，move和up是全局区域，也就是整个文档通用，应该使用document对象而不是drag对象(否则，采用drag对象时物体只能往右方或下方移动)
-            drag.onmousedown = function (e) {
-                var e = e || window.event; //兼容ie浏览器
-                var diffX = e.clientX - drag
-                .offsetLeft; //鼠标点击物体那一刻相对于物体左侧边框的距离=点击时的位置相对于浏览器最左边的距离-物体左边框相对于浏览器最左边的距离
-                var diffY = e.clientY - drag.offsetTop;
+            let div = document.getElementById("drag")
 
-                /*低版本ie bug:物体被拖出浏览器可是窗口外部时，还会出现滚动条，
-                	解决方法是采用ie浏览器独有的2个方法setCapture()\releaseCapture(),这两个方法，
-                	可以让鼠标滑动到浏览器外部也可以捕获到事件，而我们的bug就是当鼠标移出浏览器的时候，
-                	限制超过的功能就失效了。用这个方法，即可解决这个问题。注：这两个方法用于onmousedown和onmouseup中*/
-                if (typeof drag.setCapture != 'undefined') {
-                    drag.setCapture();
-                }
+            // console.log(div.offsetWidth);
+            // offsetWidth = width + padding + border
+            // wc3盒模型: width + padding + border + margin
+            // ie盒模型: width(padding + border) + margin
+            div.onmousedown = function (e) {
+
+                var e = e || window.event
+                let diffX = e.clientX - div.offsetLeft // 点击的位置与物体左边框的距离 = 点击的位置 - 物体离浏览器左边的位置 
+                let diffY = e.clientY - div.offsetTop // 同理
 
                 document.onmousemove = function (e) {
-                    var e = e || window.event; //兼容ie浏览器
-                    var left = e.clientX - diffX;
-                    var top = e.clientY - diffY;
+                    var e = e || window.event
 
-                    //控制拖拽物体的范围只能在浏览器视窗内，不允许出现滚动条
+                    let left = e.clientX - diffX // 物体离浏览器左边的位置 = 点击的位置 - 点击的位置与物理左边框的距离 用于计算移动后物体的位置
+                    let top = e.clientY - diffY // 同理
+
+                    // 控制物体在可视范围内， 且不允许出现滚动条
                     if (left < 0) {
-                        left = 0;
-                    } else if (left > window.innerWidth - drag.offsetWidth) {
-                        left = window.innerWidth - drag.offsetWidth;
+                        left = 0
+                    } else if (left > window.innerWidth - div.offsetWidth) {
+                        left = window.innerWidth - div.offsetWidth
                     }
+
                     if (top < 0) {
-                        top = 0;
-                    } else if (top > window.innerHeight - drag.offsetHeight) {
-                        top = window.innerHeight - drag.offsetHeight;
+                        top = 0
+                    } else if (top > window.innerHeight - div.offsetHeight) {
+                        top = window.innerHeight - div.offsetHeight
                     }
 
-                    //移动时重新得到物体的距离，解决拖动时出现晃动的现象
-                    drag.style.left = left + 'px';
-                    drag.style.top = top + 'px';
-                };
-                document.onmouseup = function (e) { //当鼠标弹起来的时候不再移动
-                    this.onmousemove = null;
-                    this.onmouseup = null; //预防鼠标弹起来后还会循环（即预防鼠标放上去的时候还会移动）
+                    div.style.left = left + 'px'
+                    div.style.top = top + 'px'
+                }
 
-                    //修复低版本ie bug
-                    if (typeof drag.releaseCapture != 'undefined') {
-                        drag.releaseCapture();
-                    }
-                };
+                document.onmouseup = function (e) {
+                    this.onmousemove = null
+                    this.onmouseup = null
+                }
             }
         }
     </script>

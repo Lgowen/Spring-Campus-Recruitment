@@ -7,47 +7,63 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <style>
-
+    .container {
+      /* float: left; */
+      background: red;
+      overflow: hidden;
+    }
+      .box1 {
+        width: 200px;
+        height: 200px;
+        background: #666;
+        margin-bottom: 20px;
+        /* float: left; */
+      }
+      .contenet {
+        /* overflow: hidden; */
+        float: left;
+      }
+      .box2 {
+        width: 200px;
+        height: 200px;
+        background: #888;
+        margin-top: 20px;
+      }
   </style>
 </head>
 
 <body>
-  <div id="wrap">
-    <div class="main">
-      main <br />
-      main <br />
-      main <br />
-    </div>
+  <div class="container">
+      <div class="box1">0000</div>
+      <div class="contenet">
+        <div class="box2">123123</div>
+      </div>
   </div>
-  <div id="footer">footer</div>
   <script>
-    function Foo() {
-      getName = function () {
-        console.log(1)
-      };
-      return this;
-    }
-    Foo.getName = function () {
-      console.log(2)
-    };
-    Foo.prototype.getName = function () {
-      console.log(3)
-    };
-    var getName = function () {
-      console.log(4)
-    };
+       var a = {
+         name: 'aaa'
+       }
 
-    function getName() {
-      console.log(5)
-    }
-    Foo.getName(); 2
-    getName(); 4
-    Foo().getName(); 1
-    getName(); 1
-    new Foo.getName(); 2
-    new Foo().getName(); 3
-    new new Foo().getName(); 3
+       var b = a
 
+       a = {
+         name: 'ccc'
+       }
+
+       console.log(b);
+
+       function Foo() {
+        //  this.name = 'aaa'
+       }
+
+       Foo.prototype.name = 'aaa'
+       
+       var foo = new Foo()
+
+       Foo.prototype.name = 'bbb'
+       
+       console.log(foo.name);
+       
     
   </script>
 </body>
