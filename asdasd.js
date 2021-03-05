@@ -57,22 +57,20 @@
     getMax(data)
 
     
-// const arr = []
-// while((line = read_line()) != '') {
-//     const app = line.split(' ')
-//     const order = app[0]
-//     const num = app[1]
-//     if(app[0] === 'offer'){
-//         arr.push(app[1])
-//         arr.sort((a,b) => a - b)
-//     }else {
-//         for(let i = 0; i < app[1]; i++) {
-//             if(arr[0]){
-//                 print(arr[0])
-//                 arr.shift()
-//             }else{
-//                 print(-1)
-//             }
-//         }
-//     }
-// }
+const arr = []
+while((line = read_line()) != '') {
+    const app = line.split(' ')
+    if(app[0] === 'offer'){
+        arr.push(app[1])
+        arr.sort((a,b) => a - b)
+    }else {
+        for(let i = 0; i < app[1]; i++) {
+            if(arr[0]){
+                print(arr[0])
+                arr.shift()
+            }else{
+                print(-1)
+            }
+        }
+    }
+}

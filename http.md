@@ -55,6 +55,43 @@ post 不同，post 做的一般是修改和删除的工作，所以必须与数�
    7. 四次挥手断开连接 ->  C 发送 FIN 释放连接报文段和一个随机序号 -> S 收到释放连接请求后回复一个 ACK报文段和一个随机序号 -> 这时候已经断开了从 C -> S 的连接 但是 S 还能向 C 发送数据 -> S 发送一个 FIN释放连接 和 ACK 报文段和一个随机序号确认释放连接 -> C 收到确认连接后发送一个ACK报文段和一个随机序号告诉 S 我收到了
 ```
 
+```javascript
+function debounce(fn, wait) {
+  var timer = null;
+
+  return function() {
+    var context = this,
+      args = arguments;
+
+    // 如果此时存在定时器的话，则取消之前的定时器重新记时
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
+    }
+
+    // 设置定时器，使事件间隔指定事件后执行
+    timer = setTimeout(() => {
+      fn.apply(context, args);
+    }, wait);
+  };
+}
+// 函数节流的实现;
+function throttle(fn, delay) {
+  var preTime = Date.now();
+
+  return function() {
+    var context = this,
+      args = arguments,
+      nowTime = Date.now();
+
+    // 如果两次时间间隔超过了指定时间，则执行函数。
+    if (nowTime - preTime >= delay) {
+      preTime = Date.now();
+      return fn.apply(context, args);
+    }
+  };
+}
+```
 ## url(资源类型、存放资源的主机域名、资源文件名)
 
 ```html
@@ -133,6 +170,7 @@ Server: Apache 0.84
 - 400: 客户端请求的语法错误,服务器无法理解
 - 403: 服务器能理解客户端的请求,但拒绝执行该请求
 - 404: 服务器无法找到客户端请求的资源
+- 
 - 500: 服务器内部错误,无法完成请求
 - 502: 作为网关或者代理工作的服务器尝试执行请求时，从远程服务器接收到了一个无效的响应
 - 503: 由于超载或系统维护，服务器暂时的无法处理客户端的请求。延时的长度可包含在服务器的Retry-After头信息中
