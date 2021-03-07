@@ -174,11 +174,6 @@ MyPromise.prototype.then = function (fulfilledCallback, rejectedCallback) {
     if(this.state === REJECTED) {
         rejectedCallback(this.value)
     }
-<<<<<<< HEAD
-    return pre
-}
-
-=======
 }
 
 let promise = new MyPromise(function (resolve, rejectd) {
@@ -188,4 +183,3 @@ let promise = new MyPromise(function (resolve, rejectd) {
 promise.then(res => console.log(res)) // 1
 
 
->>>>>>> 346aae801831677aa8cd8182bbc7a1e2130f641d

@@ -1974,9 +1974,7 @@ const REJECTED = 'rejected'
 
 function MyPromise (fn) {
     
-
     let self = this
-   
     // 状态
     this.state = PENDING
 

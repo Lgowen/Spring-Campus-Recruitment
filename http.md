@@ -56,6 +56,53 @@ post 不同，post 做的一般是修改和删除的工作，所以必须与数�
 ```
 
 ```javascript
+   // 发布者
+   function Publish () {
+     // 订阅者列表
+     this.observers = []
+     this.attach = function (callback) {
+       this.observers.push(callback)
+     }
+     // 发布消息
+     this.notify = function (value) {
+       this.observers.forEach(callback => callback(value))
+     }
+   }
+ 
+   // 订阅者
+   function Observe (queue, key, callback) {
+      queue[key].attach(callback)
+   }
+  
+   // 数据拦截
+   function proxyWatcher (data, queue) {
+       return new Proxy(data, {
+         get: (target, key) => target[key],
+         set: (target, key, value) => {
+           target[key] = value
+           queue[key].notify(value)
+         }
+       })
+   }
+
+   // 消息队列
+   const messageQueue = {}
+   
+   // 数据
+   const myData = proxyWatcher({ name: 'Lgowen' }, messagQueue)
+   
+   // 为数据中的每一个属性都作为一个发布者
+   for(let key in myData) {
+     messageQueue[key] = new Publish()
+   }
+   
+   // 订阅 name 值的变化
+   Observe(messageQueue, 'name', name => {
+     console.log('更新后的name', name)
+   })
+```
+
+```javascript
 function debounce(fn, wait) {
   var timer = null;
 
