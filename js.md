@@ -1963,6 +1963,8 @@ Proxy 可以理解成，在目标对象之前架设一层“拦截”，外界�
 Promise 对象是异步编程的一种解决方案，最早由社区提出。Promises/A+ 规范是 JavaScript Promise 的标准，规定了一个 Promise 所必须具有的特性。
 
 Promise 是一个构造函数，接收一个函数作为参数，返回一个 Promise 实例。一个 Promise 实例有三种状态，分别是 pending、resolved 和 rejected，分别代表了进行中、已成功和已失败。实例的状态只能由 pending 转变 resolved 或者 rejected 状态，并且状态一经改变，就凝固了，无法再被改变了。状态的改变是通过 resolve() 和 reject() 函数来实现的，我们
+
+Promise.all([p1, p2, p3]) -> 接收的参数可以是一个数组,数组的每一项是promise
 ```
 
 ## 97. 手写一个 Promise

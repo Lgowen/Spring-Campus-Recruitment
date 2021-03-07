@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            background-color: #666;
+        }
+        .aaa {
+            width: 230px;
+            height: 240px;
+        }
+        .aaa:hover {
+            width: 230px;
+            height: 240px;
+            background-image: url(https://hr.cvte.com/images/job-types02.png);
+        }
+        .container {
+            position: relative;
+            width: 230px;
+            height: 240px;
+            background: white;
+            transition: all 0.75s ease-in;
+            overflow: hidden;
+        }
+
+        .container::before {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            z-index: 2;
+            display: block;
+            content: '';
+            width: 0;
+            height: 0;
+            background-color: rgba(229, 40, 40, 0.2);
+            border-radius: 100%;
+            -webkit-transform: translate(-50%, -50%);
+            -ms-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+            opacity: 0;
+        }
+        .container:hover::before {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            z-index: 3;
+            display: block;
+            content: '';
+            width: 0;
+            height: 0;
+            /* background-color: rgba(229, 40, 40, 0.2); */
+            border-radius: 100%;
+            -webkit-transform: translate(-50%, -50%);
+            -ms-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+            opacity: 1;
+            animation: circle___2YCzf 0.75s;
+            overflow: hidden;
+        }
+
+        .container:hover {
+            color: white;
+            position: relative;
+            width: 230px;
+            height: 240px;
+            transition: background .75s;
+            background: linear-gradient(#e52828 40%, rgba(229, 40, 40, 0.8) 60%, rgba(229, 40, 40, 0.6) 80%, rgba(229, 40, 40, 0.5));
+        }
+
+        .container .img {
+            background-size: 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+            width: 100%;
+            height: 126px;
+            padding-top: 30px;
+            overflow: hidden;
+            transition: all 0.5s ease-in;
+            background-image: url(https://hr.cvte.com/images/job-types02-hover.png);
+        }
+
+        .container:hover .img {
+            background-size: 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+            width: 100%;
+            height: 126px;
+            padding-top: 30px;
+            overflow: hidden;
+            background-image: url(https://hr.cvte.com/images/job-types02-active.png);
+        }
+
+        .container .content {
+            font-size: 20px;
+            font-weight: bold;
+            letter-spacing: 0;
+            text-align: center;
+        }
+
+        @keyframes circle___2YCzf {
+            0% {
+                opacity: 1;
+            }
+
+            40% {
+                opacity: 1;
+            }
+
+            100% {
+                width: 200%;
+                height: 200%;
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="aaa">
+        <div class="container">
+            <div class="img"></div>
+            <div class="content">软件类</div>
+        </div>
+    </div>
+</body>
+
+</html>
