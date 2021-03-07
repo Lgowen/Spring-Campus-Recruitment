@@ -717,3 +717,25 @@ dom -> canvas -> base64
 
 问题: 由于不同浏览器对于offsetHight的计算不同,与html2Canvas本身制作取的值不同导致了此缺陷
 解决方案: 修改布局
+
+
+## vite-graduation-project
+
+1. markdown转html
+2. 登录注册(cookie跨域, 
+ withCredentials: true, 
+"Access-Control-Allow-Origin", req.headers.origin
+
+ )
+1. 瀑布流
+2. 
+
+
+打算实现: token验证
+1. 前端向服务端发送用户名和密码。
+2. 登录成功生成jwt,并返回
+3. localStorage保存token
+4. axios请求拦截给Authorization加上token
+5. 服务单收到token,进行验证,确认用户信息
+6. 验证成功,就返回数据,
+7. 显示没有权限,返回到登录页.
