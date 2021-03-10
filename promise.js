@@ -1,4 +1,3 @@
-const { type } = require("node:os")
 
 class Promise {
 

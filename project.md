@@ -738,4 +738,9 @@ dom -> canvas -> base64
 4. axios请求拦截给Authorization加上token
 5. 服务单收到token,进行验证,确认用户信息
 6. 验证成功,就返回数据,
-7. 显示没有权限,返回到登录页.
+7. 显示没有权限,返回到登录页
+
+jwt
+1. 不易被攻击，安全性高
+2. 利用Authorization首部传输token，无跨域问题
+3. 额外信息存储在客户端，服务端占用资源不多，也不存在session共享问题
