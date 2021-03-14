@@ -31,6 +31,15 @@ const handleChange = e => {
 
 // 发布 + 订阅
 
+
+
+
+// 观察者模式(发布 - 订阅)
+
+// 发布者
+
+
+
 // 发布者
 function Publish() {
     
