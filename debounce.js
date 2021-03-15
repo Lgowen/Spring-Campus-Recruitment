@@ -53,3 +53,38 @@ function throttle (fn, wait) {
 
 // 区别在于，使用时间戳实现的节流函数会在第一次触发事件时立即执行，以后每过 delay 秒之后才执行一次，并且最后一次触发事件不会被执行；
 // 而定时器实现的节流函数在第一次触发时不会执行，而是在 delay 秒之后才执行，当最后一次停止触发后，还会再执行一次函数。
+
+
+function debouce(fn, time) {
+    let timer = null
+
+    return function () {
+
+        const _this = this
+        const args = arguments
+
+        if (timer) {
+            clearTimeout(timer)
+            timer = null
+        }
+
+        timer = setTimeout(fn.apply(_this, args), time)
+    }
+}
+
+
+function throttle (fn, wait) {
+    let preTime = Date.now()    
+
+    return function () {
+        const nowTime = Date.now()
+        const _this = this
+        const args = argumentsh
+
+        if (nowTime - preTime >= wait) {
+            preTime = Date.now() // 重新计算当前时间
+            return fn.apply(_this, args)
+        }
+
+    }
+}

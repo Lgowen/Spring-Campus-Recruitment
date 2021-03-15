@@ -566,6 +566,7 @@ function randomSort(array) {
    2. 对象调用,this -> 对象
    3. 实例化调用,this -> 实例化对象
    4. call、apply、bind -> this -> 传入的值(改变this指向)
+   5. 箭头函数的, this -> 从自己的作用域链的上一层继承this
    
    call 和 apply 的不同在于传参列表不同 call(thisObj, arg1, arg2) apply(thisObj, [arg1, arg2]) 
    bind -> bind(thisObj) return 一个this -> thisObj 的函数
@@ -653,6 +654,68 @@ on 对象、navigator 对象、screen 对象等子对象，并且 DOM 的最根�
 ## 37. 写一个观察者模式(发布订阅者模式)
 
 ```javascript
+// 发布者
+function Pubilsh () {
+  // 订阅者列表
+  this.messageList = []
+  
+  // 添加订阅者
+  this.addMessage = function (callback) {
+    this.messageList.push(callback)
+  }
+  
+  // 通知订阅者
+  this.notify = function (value) {
+    this.messageList.forEach(callback => callback(value))
+  }
+}
+
+// 订阅者
+function Observer(messageQueue, key, callback) {
+  messageQueue[key].addMessage(callback)
+}
+
+function DefinePropertyWatcher (data, messageQueue) {
+   for (let key in data) {
+       let value = data[key]
+       Object.defineProperty(data, {
+         enumerable: true,
+         configurable: true,
+         get: () => value
+         set: newValue => {
+           value = newValue
+           // 通知所有订阅者
+           messageQueue[key].notify(value)
+         }
+       })
+   }
+}
+
+function ProxyWatcher (data, message) {
+   return new Proxy(data, {
+     set: (target, key, value) => {
+       target[key] = value
+       // 通知所有订阅者
+       messageQueue[key].notify(value)
+     }
+     get: (target, key) => target[key]
+   }) 
+}
+
+const messageQueue = {}  // 消息队列
+
+const data = {name: 'lgowen'} // 要绑定的数据源
+
+const myData = ProxyWatcher(data, messageQueue) 
+
+for(let key in myData) {
+  myData[key] = new Publish()
+}
+
+Observer(messageQueue, 'name', name => {
+  console.log('劫持了name属性')
+})
+
 
 ```
 
