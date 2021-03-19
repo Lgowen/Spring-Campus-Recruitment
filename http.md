@@ -44,10 +44,6 @@ post 不同，post 做的一般是修改和删除的工作，所以必须与数�
 
 ## 在浏览器中输入url到页面加载显示完成，这个过程发生了什么
 
-## webpack
-
-
-
 ## vue-router
 
 1. hash(哈希模式)
@@ -61,6 +57,23 @@ post 不同，post 做的一般是修改和删除的工作，所以必须与数�
    - H5新增API，pushState和replaceState（改变浏览器地址，不刷新页面）
    - 阻止a标签默认事件，获取a标签herf属性值，pushState改变地址栏，根据location.pathName展示不同的router-view内容
 
+
+## webpack
+
+1. Entry： 指定webpack开始构建的入口模块，从该模块开始构建并计算出直接或间接依赖的模块或者库
+2. Output： 告诉webpack如何命名输出文件以及输出的目录
+3. Loaders： 由于webpack只能处理javascript，所以我们需要对一些非js文件处理成webpack能够处理的模块，比如sass文件
+             style-loader css-loader less less-loader postcss-loader(css添加浏览器前缀, autoprefixer)
+             url-loader、file-loader(如果文件小于限制大小，返回base64，否则file-loader将文件移动到输出的目录中)
+             babel-loader（es678转es5） babel-polifill(promise等api需要用这个)
+             vue-loader vue-template-compiler vue-style-loader
+ 
+4. Plugins： 插件(html-webpack-plugin: 解决每次打包后的js在html中引入需要重复修改文件名的问题)
+             clean-webpack-plugin
+            webpack-dev-server(热更新)
+             
+5. Chunk： 
+  
 ## vite
 
 1. vite是基于浏览器原生ES modules的开发服务器,利用浏览器去解析import,在服务端按预编译返回，跳过了打包。
@@ -73,6 +86,16 @@ post 不同，post 做的一般是修改和删除的工作，所以必须与数�
 1. 启动时依赖预打包(esbuild): 减少模块/请求数量 支持CommonJS依赖
 2. 更好的css支持
 3. 服务端渲染支持: 
+
+## 懒加载
+
+1. getBoundingClientRect （相对浏览器视窗）clientHeight（可视区高度）scroll (监听scroll事件)
+2. Intersection Observer 
+
+## 预加载
+1. 隐藏img元素
+2. script标签引入 new Image
+
 
 ```html
    1. (首先对url进行解析 -> 分析使用的传输协议和资源路径) -> 如果输入的协议或主机名不合法 -> 将输入的内容传给搜索引擎进行处理 -> 如果没有问题 -> 检查url是否有非法字符 -> 有的话进行转义再进行下一步操作
