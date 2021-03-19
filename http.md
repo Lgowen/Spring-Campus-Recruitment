@@ -44,6 +44,22 @@ post 不同，post 做的一般是修改和删除的工作，所以必须与数�
 
 ## 在浏览器中输入url到页面加载显示完成，这个过程发生了什么
 
+## webpack
+
+
+
+## vue-router
+
+1. hash(哈希模式)
+   - 采用锚点的方式
+   - 浏览器提供原生监听事件hashChange
+   - 可以监听a标签、浏览器的前进后退、window.location改变地址
+
+
+2. history(历史模式)
+   - 依赖原生事件popState
+   - H5新增API，pushState和replaceState（改变浏览器地址，不刷新页面）
+   - 阻止a标签默认事件，获取a标签herf属性值，pushState改变地址栏，根据location.pathName展示不同的router-view内容
 
 ## vite
 
@@ -67,6 +83,8 @@ post 不同，post 做的一般是修改和删除的工作，所以必须与数�
    6. 当页面请求发送到服务器端后，服务器端会返回一个 html 文件作为响应，浏览器接收到响应后，开始对 html 文件进行解析，开始页面的渲染过程
       DOM tree + CSSOM rule tree -> 如果碰到js文件将阻塞 DOM tree -> 等到cssom rule tree解析构建完成 -> 继续解析DOM tree -> render tree -> layout -> 浏览器的 UI 接口（GUI） paint -> display
    7. 四次挥手断开连接 ->  C 发送 FIN 释放连接报文段和一个随机序号 -> S 收到释放连接请求后回复一个 ACK报文段和一个随机序号 -> 这时候已经断开了从 C -> S 的连接 但是 S 还能向 C 发送数据 -> S 发送一个 FIN释放连接 和 ACK 报文段和一个随机序号确认释放连接 -> C 收到确认连接后发送一个ACK报文段和一个随机序号告诉 S 我收到了
+   哈希：window.location ------   history: popstate 
+   pushState 和 replaceState 都是 HTML5 的新 API，他们的作用很强大，可以做到改变浏览器地址却不刷新页面。这是实现改变地址栏却不刷新页面的重要方法。
 ```
 
 ```javascript
